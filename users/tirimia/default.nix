@@ -1,23 +1,22 @@
-{
+args @ {
   self,
   config,
   lib,
   pkgs,
   home-manager,
   ...
-} @ args: let
+}: let
   username = "tirimia";
-  #zsh = import ../../config/software/zsh { inherit username; } ;
+  enhancedArgs = args // {inherit username;};
 in {
   imports = [
     home-manager.nixosModules.default
     # ../../config/software/i3
-    ../../config/software/zsh
+    (import ../../config/software/zsh enhancedArgs)
+    ../../config/software/emacs.nix
   ];
   # TODO: for window manager, actually use a systemd service if we depend on bars and shizz
   # TODO: use xmonad
-
-  zsh.for = username;
 
   users.users.${username} = {
     isNormalUser = true;

@@ -10,7 +10,6 @@ args @ {
   imports = [
     ./hardware-configuration.nix
     ../../config/base.nix
-    ../../config/software/zsh
   ];
 
   networking = {
