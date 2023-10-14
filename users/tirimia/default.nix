@@ -20,6 +20,7 @@ in {
 
   users.users.${username} = {
     isNormalUser = true;
+    description = "Theodor Irimia";
     initialPassword = "wouldntyouliketoknowweatherboy";
     extraGroups = ["wheel" "networkmanager" "libvirtd" "docker" "tty"];
     shell = "/run/current-system/sw/bin/zsh";
