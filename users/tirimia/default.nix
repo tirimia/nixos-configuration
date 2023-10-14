@@ -1,0 +1,40 @@
+{
+  self,
+  config,
+  lib,
+  pkgs,
+  home-manager,
+  ...
+} @ args: let
+  username = "tirimia";
+  #zsh = import ../../config/software/zsh { inherit username; } ;
+in {
+  imports = [
+    home-manager.nixosModules.default
+    # ../../config/software/i3
+    ../../config/software/zsh
+  ];
+  # TODO: for window manager, actually use a systemd service if we depend on bars and shizz
+  # TODO: use xmonad
+
+  zsh.for = username;
+
+  users.users.${username} = {
+    isNormalUser = true;
+    initialPassword = "wouldntyouliketoknowweatherboy";
+    extraGroups = ["wheel" "networkmanager" "libvirtd" "docker" "tty"];
+    shell = "/run/current-system/sw/bin/zsh";
+  };
+
+  home-manager = {
+    useUserPackages = true;
+    useGlobalPkgs = true;
+    users.${username} = {
+      home = {
+        homeDirectory = "/home/${username}";
+        stateVersion = "23.05";
+      };
+      programs.home-manager.enable = true;
+    };
+  };
+}
