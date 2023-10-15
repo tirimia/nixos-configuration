@@ -9,6 +9,7 @@
   imports = []; # TODO: maybe import and take advantage of existing zsh module
   options = {};
   config = {
+    users.users.${username}.shell = pkgs.zsh;
     home-manager.users.${username} = {
       programs.zsh = {
         enable = true;
