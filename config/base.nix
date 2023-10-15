@@ -6,6 +6,7 @@
 }: {
   environment = {
     systemPackages = with pkgs; [
+      gnumake
       vim
       git
       curl
@@ -14,6 +15,7 @@
     ];
   };
 
+  security.sudo.wheelNeedsPassword = false;
   services = {
     tlp = {
       enable = true;

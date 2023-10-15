@@ -6,7 +6,7 @@
 }: {
   services.emacs = {
     enable = true;
-    package = pkgs.emacs-unstable;
+    package = pkgs.emacs29;
   };
   # nixpkgs.overlays = [
   #   (import (builtins.fetchTarball {
