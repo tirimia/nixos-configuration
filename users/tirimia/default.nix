@@ -7,12 +7,15 @@ args @ {
   ...
 }: let
   username = "tirimia";
-  enhancedArgs = args // {inherit username;};
+  name = "Theodor Irimia";
+  email = "theodor.irimia@gmail.com";
+  enhancedArgs = args // {inherit username name email;};
 in {
   imports = [
     home-manager.nixosModules.default
     # ../../config/software/i3
     (import ../../config/software/zsh enhancedArgs)
+    (import ../../config/software/git.nix enhancedArgs)
     ../../config/software/emacs.nix
   ];
   # TODO: for window manager, actually use a systemd service if we depend on bars and shizz
@@ -20,7 +23,7 @@ in {
 
   users.users.${username} = {
     isNormalUser = true;
-    description = "Theodor Irimia";
+    description = name;
     initialPassword = "wouldntyouliketoknowweatherboy";
     extraGroups = ["wheel" "networkmanager" "libvirtd" "docker" "tty"];
     shell = "/run/current-system/sw/bin/zsh";

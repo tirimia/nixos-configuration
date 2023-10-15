@@ -71,9 +71,9 @@ args @ {
 
   nixpkgs.config.allowUnfree = true;
   services.openssh = {
-	enable = true;
+    enable = true;
     settings.PasswordAuthentication = true;
-};
+  };
 
   environment.systemPackages = with pkgs; [
     vim

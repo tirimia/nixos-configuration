@@ -4,8 +4,12 @@
   pkgs,
   ...
 }: {
+  imports = [
+    ./software/nix.nix
+  ];
   environment = {
     systemPackages = with pkgs; [
+      alacritty
       gnumake
       vim
       git
