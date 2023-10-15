@@ -10,6 +10,7 @@
   options = {};
   config = {
     home-manager.users.${username} = {
+      shell = pkgs.zsh;
       programs.zsh = {
         enable = true;
         enableCompletion = true;

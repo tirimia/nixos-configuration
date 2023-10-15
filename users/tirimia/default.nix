@@ -26,7 +26,6 @@ in {
     description = name;
     initialPassword = "wouldntyouliketoknowweatherboy";
     extraGroups = ["wheel" "networkmanager" "libvirtd" "docker" "tty"];
-    shell = "/run/current-system/sw/bin/zsh";
   };
 
   home-manager = {
