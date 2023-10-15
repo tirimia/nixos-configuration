@@ -16,22 +16,59 @@
         enableAutosuggestions = true;
         enableSyntaxHighlighting = true;
         dotDir = ".config/zsh";
-        oh-my-zsh = {
-          enable = true;
-          custom = ".config/zsh/oh-my-zsh";
-          theme = "powerlevel10k";
-          plugins =
-            [
-              "sudo"
-              "git"
-              "fzf"
-            ]
-            ++ lib.optionals pkgs.stdenv.isDarwin ["brew" "macos"]
-            ++ lib.optionals pkgs.stdenv.isLinux [];
-        };
         initExtra = ''
-          source ~/.config/zsh/powerlevel10k.zsh
+          if [[ -r "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh" ]]; then
+            source "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh"
+          fi
+          autoload -Uz promptinit colors
+          promptinit
+                unsetopt beep
+          unsetopt hist_beep
+          unsetopt ignore_braces
+          unsetopt list_beep
+          setopt always_to_end
+          setopt prompt_subst
+          setopt share_history
+
+              source ~/.config/zsh/powerlevel10k.zsh
         '';
+        plugins = [
+          {
+            name = "cattppuccin-zsh-syntax-highlighting";
+            src = pkgs.fetchFromGitHub {
+              owner = "catppuccin";
+              repo = "zsh-syntax-highlighting";
+              rev = "06d519c20798f0ebe275fc3a8101841faaeee8ea";
+              sha256 = "sha256-Q7KmwUd9fblprL55W0Sf4g7lRcemnhjh4/v+TacJSfo=";
+            };
+
+            file = "themes/catppuccin_mocha-zsh-syntax-highlighting.zsh";
+          }
+
+          {
+            name = "nix-zsh-completions";
+            src = pkgs.nix-zsh-completions;
+            file = "share/zsh/plugins/nix/nix-zsh-completions.plugin.zsh";
+          }
+
+          {
+            name = "powerlevel10k";
+            src = pkgs.zsh-powerlevel10k;
+            file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
+          }
+
+          {
+            name = "zsh-autopair";
+            src = pkgs.zsh-autopair;
+            file = "share/zsh/zsh-autopair/autopair.zsh";
+          }
+
+          {
+            name = "zsh-completions";
+            src = pkgs.zsh-completions;
+            file = "share/zsh-completions/zsh-completions.plugin.zsh";
+          }
+        ];
       };
       programs.fzf = {
         enable = true;
