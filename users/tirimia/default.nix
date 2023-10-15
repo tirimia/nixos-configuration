@@ -26,6 +26,7 @@ in {
     description = name;
     initialPassword = "wouldntyouliketoknowweatherboy";
     extraGroups = ["wheel" "networkmanager" "libvirtd" "docker" "tty"];
+    shell = pkgs.zsh;
   };
 
   home-manager = {

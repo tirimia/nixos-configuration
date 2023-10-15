@@ -10,7 +10,6 @@
   options = {};
   config = {
     home-manager.users.${username} = {
-      shell = pkgs.zsh;
       programs.zsh = {
         enable = true;
         enableCompletion = true;
@@ -23,7 +22,7 @@
           fi
           autoload -Uz promptinit colors
           promptinit
-                unsetopt beep
+          unsetopt beep
           unsetopt hist_beep
           unsetopt ignore_braces
           unsetopt list_beep
