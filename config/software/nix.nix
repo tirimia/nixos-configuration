@@ -2,14 +2,13 @@
   pkgs,
   lib,
   config,
-  nixpkgs,
   ...
 }: {
   imports = [];
   options = {};
   config = {
-    environment.systemPackages = [
-      nixpkgs.alejandra
+    environment.systemPackages = with pkgs; [
+      alejandra
     ];
   };
 }
