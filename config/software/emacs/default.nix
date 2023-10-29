@@ -33,7 +33,6 @@ in {
           source = ./config;
           recursive = true;
         };
-        # TODO: add nixd
         packages = with pkgs; [
           black
           cargo
@@ -46,6 +45,7 @@ in {
           gotools
           lua
           just
+          unstablePkgs.nixd
           nodePackages_latest.typescript-language-server
           ruff
           rustc
