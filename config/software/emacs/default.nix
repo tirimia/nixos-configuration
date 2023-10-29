@@ -9,17 +9,6 @@
   emacsWithPackages = (pkgs.emacsPackagesFor myBaseEmacs).emacsWithPackages;
   myEmacs = emacsWithPackages (epkgs: (with epkgs; [
     melpaPackages.vterm
-    tree-sitter
-    (tree-sitter-langs.withPlugins (p:
-      tree-sitter-langs.plugins
-      ++ [
-        p.tree-sitter-markdown
-        p.tree-sitter-go
-        p.tree-sitter-gomod
-        p.tree-sitter-typescript
-        p.tree-sitter-tsx
-        p.tree-sitter-json
-      ]))
   ]));
 in {
   imports = [];
@@ -41,6 +30,13 @@ in {
           source = ./config;
           recursive = true;
         };
+        file.".tree-sitter".source = pkgs.runCommand "grammars" {} ''
+          mkdir -p $out/bin
+          ${lib.concatStringsSep "\n"
+            (lib.mapAttrsToList
+              (name: src: "name=${name}; ln -s ${src}/parser $out/bin/\${name#tree-sitter-}.so")
+              pkgs.tree-sitter.builtGrammars)};
+        '';
         packages = with pkgs; [
           black
           cargo
