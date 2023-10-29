@@ -28,6 +28,7 @@
           black
           cargo
           cmake
+          libvterm # TODO: maybe just install the vterm package from nix pkgs
           docker
           go
           gofumpt
