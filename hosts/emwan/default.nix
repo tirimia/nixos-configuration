@@ -1,5 +1,10 @@
-{ config, lib, pkgs, user, ...}:
 {
+  config,
+  lib,
+  pkgs,
+  user,
+  ...
+}: {
   imports = [
     ../../config/software/emacs
   ];
