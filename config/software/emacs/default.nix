@@ -30,7 +30,7 @@ in {
           source = ./config;
           recursive = true;
         };
-        file.".tree-sitter".source = pkgs.runCommand "grammars" {} ''
+        file.".config/emacs/tree-sitter".source = pkgs.runCommand "grammars" {} ''
           mkdir -p $out/bin
           ${lib.concatStringsSep "\n"
             (lib.mapAttrsToList
