@@ -10,6 +10,9 @@
   myEmacs = emacsWithPackages (epkgs: (with epkgs.melpaPackages; [
     vterm
   ]));
+  treeSitter =
+    pkgs.tree-sitter.withPlugins
+    (p: [p.tree-sitter-go p.tree-sitter-gomod p.tree-sitter-typescript p.tree-sitter-tsx p.tree-sitter-json]);
 in {
   imports = [];
   options = {
@@ -44,11 +47,13 @@ in {
           lua
           just
           nodePackages_latest.typescript-language-server
+          ruff
           rustc
           rust-analyzer
           ripgrep
           unstablePkgs.bun
           terraform-ls
+          treeSitter
           yamllint
           unstablePkgs.zig
           unstablePkgs.zls

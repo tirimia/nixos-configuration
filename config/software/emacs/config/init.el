@@ -1127,7 +1127,7 @@ file compatible with the kafka partition reassignment tool."
 (setq org-latex-pdf-process '("%latex -interaction nonstopmode -output-directory %o %f" "%latex -interaction nonstopmode -output-directory %o %f" "%latex -interaction nonstopmode -output-directory %o %f"))
 ;; ("tectonic -Z shell-escape --outdir=%o %f")
 (setq org-export-dispatch-use-expert-ui t) ;; Get menu in minibuffer, don't show entire thing
-(setq-default org-directory "/Users/tirimia/MEGA/Org"
+(setq-default org-directory "~/MEGA/Org"
               org-startup-folded t
               org-image-actual-width nil
               org-element-use-cache nil)
@@ -1173,14 +1173,14 @@ file compatible with the kafka partition reassignment tool."
                         (org-agenda-prefix-format "%c : %b %s")
                         (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled)) ;; Only show TODOs without scheduled or deadline timestamps
                         )))))
-      org-agenda-files '("/Users/tirimia/MEGA/Org/Agenda.org" "/Users/tirimia/MEGA/Org/Daily")
+      org-agenda-files '("~/MEGA/Org/Agenda.org" "~/MEGA/Org/Daily")
       org-agenda-span 14
       org-agenda-start-with-log-mode t
       org-log-done 'time
       calendar-location-name "Dusseldorf, Germany"
       calendar-longitude 6.78
       calendar-latitude 51.2
-      org-default-notes-file "/Users/tirimia/MEGA/Org/Agenda.org"
+      org-default-notes-file "~/MEGA/Org/Agenda.org"
       org-capture-templates '(("d" "Default" entry (file org-default-notes-file)   "* TODO %^{Name}\nDEADLINE: %^{Due: }t\n%?"))
       ;; TODO: replace full paths with (concat org-directory path)
       org-agenda-window-setup 'only-window
@@ -1205,7 +1205,7 @@ file compatible with the kafka partition reassignment tool."
 (use-package org-roam
   :init (setq org-roam-v2-ack t)
   :config
-  (setq org-roam-directory "/Users/tirimia/MEGA/Org"
+  (setq org-roam-directory "~/MEGA/Org"
 	org-roam-completion-everywhere t
 	org-roam-capture-templates '(("d" "default" plain "%?" :if-new
 				      (file+head "%<%Y%m%d>-${slug}.org" "#+TITLE: ${title}\n")
@@ -1236,7 +1236,7 @@ file compatible with the kafka partition reassignment tool."
 
 
 ;; Dailies
-(setq org-roam-dailies-directory "/Users/tirimia/MEGA/Org/Daily"
+(setq org-roam-dailies-directory "~/MEGA/Org/Daily"
       org-roam-dailies-capture-templates
       '(("d" "default" plain
          "%?"
