@@ -34,7 +34,7 @@ in {
           mkdir -p $out/bin
           ${lib.concatStringsSep "\n"
             (lib.mapAttrsToList
-              (name: src: "name=${name}; ln -s ${src}/parser $out/bin/\${name#tree-sitter-}.so")
+              (name: src: "name=${name}; ln -s ${src}/parser $out/\lib${name}")
               pkgs.tree-sitter.builtGrammars)};
         '';
         packages = with pkgs; [
