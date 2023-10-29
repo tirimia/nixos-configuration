@@ -27,6 +27,7 @@
         packages = with pkgs; [
           black
           cargo
+          cmake
           docker
           go
           gofumpt
