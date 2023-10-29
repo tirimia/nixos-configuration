@@ -5,9 +5,9 @@
   unstablePkgs,
   ...
 }: let
-  myEmacs = pkgs.emacs29;
-  emacsWithPackages = (pkgs.emacsPackagesFor myEmacs).emacsWithPackages;
-  myPackages = emacsWithPackages (epkgs: (with epkgs.melpaPackages; [
+  myBaseEmacs = pkgs.emacs29;
+  emacsWithPackages = (pkgs.emacsPackagesFor myBaseEmacs).emacsWithPackages;
+  myEmacs = emacsWithPackages (epkgs: (with epkgs.melpaPackages; [
     vterm
   ]));
 in {
@@ -31,30 +31,28 @@ in {
           recursive = true;
         };
         # TODO: add nixd
-        packages = with pkgs;
-          [
-            black
-            cargo
-            docker
-            go
-            gofumpt
-            golangci-lint
-            golangci-lint-langserver
-            gopls
-            gotools
-            lua
-            just
-            nodePackages_latest.typescript-language-server
-            rustc
-            rust-analyzer
-            ripgrep
-            unstablePkgs.bun
-            terraform-ls
-            yamllint
-            unstablePkgs.zig
-            unstablePkgs.zls
-          ]
-          ++ myPackages;
+        packages = with pkgs; [
+          black
+          cargo
+          docker
+          go
+          gofumpt
+          golangci-lint
+          golangci-lint-langserver
+          gopls
+          gotools
+          lua
+          just
+          nodePackages_latest.typescript-language-server
+          rustc
+          rust-analyzer
+          ripgrep
+          unstablePkgs.bun
+          terraform-ls
+          yamllint
+          unstablePkgs.zig
+          unstablePkgs.zls
+        ];
       };
     };
   };
