@@ -6,12 +6,12 @@
 }: {
   config = {
     fonts.fontconfig.enable = true;
-    fonts.packages = with pkgs; [
+    fonts.fonts = with pkgs; [
+      iosevka-comfy.comfy-wide
+      intel-one-mono
       (nerdfonts.override {
         fonts = [
           "FiraCode"
-          # "IntoneMono" # TODO: figure out how to get IntelOneMono installed
-          "Iosevka"
           "SourceCodePro"
         ];
       })
