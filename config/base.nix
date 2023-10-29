@@ -11,6 +11,7 @@
     systemPackages = with pkgs; [
       alacritty
       gnumake
+      fd
       vim
       git
       curl
