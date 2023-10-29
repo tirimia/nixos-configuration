@@ -4,7 +4,13 @@
   pkgs,
   unstablePkgs,
   ...
-}: {
+}: let
+  myEmacs = pkgs.emacs29;
+  # This generates an emacsWithPackages function. It takes a single
+  # argument: a function from a package set to a list of packages
+  # (the packages that will be available in Emacs).
+  emacsWithPackages = (pkgs.emacsPackagesFor myEmacs).emacsWithPackages;
+in {
   imports = [];
   options = {
     target.user = lib.mkOption {
@@ -15,8 +21,9 @@
   config = {
     services.emacs = {
       enable = true;
-      package = pkgs.emacs29;
+      package = myEmacs;
     };
+
     home-manager.users.${config.target.user} = {
       home = {
         file.".config/emacs" = {
@@ -24,30 +31,32 @@
           recursive = true;
         };
         # TODO: add nixd
-        packages = with pkgs; [
-          black
-          cargo
-          cmake
-          libvterm # TODO: maybe just install the vterm package from nix pkgs
-          docker
-          go
-          gofumpt
-          golangci-lint
-          golangci-lint-langserver
-          gopls
-          gotools
-          lua
-          just
-          nodePackages_latest.typescript-language-server
-          rustc
-          rust-analyzer
-          ripgrep
-          unstablePkgs.bun
-          terraform-ls
-          yamllint
-          unstablePkgs.zig
-          unstablePkgs.zls
-        ];
+        packages = with pkgs;
+          [
+            black
+            cargo
+            docker
+            go
+            gofumpt
+            golangci-lint
+            golangci-lint-langserver
+            gopls
+            gotools
+            lua
+            just
+            nodePackages_latest.typescript-language-server
+            rustc
+            rust-analyzer
+            ripgrep
+            unstablePkgs.bun
+            terraform-ls
+            yamllint
+            unstablePkgs.zig
+            unstablePkgs.zls
+          ]
+          ++ emacsWithPackages (epkgs: (with epkgs.melpaPackages; [
+            vterm
+          ]));
       };
     };
   };
