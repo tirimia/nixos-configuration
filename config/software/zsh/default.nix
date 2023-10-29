@@ -2,14 +2,13 @@
   pkgs,
   lib,
   config,
-  nixpkgs,
-  username,
   ...
 }: {
-  imports = []; # TODO: maybe import and take advantage of existing zsh module
-  options = {};
+  imports = [];
+  options = {
+  };
   config = {
-    home-manager.users.${username} = {
+    home-manager.users.${config.target.user} = {
       programs.zsh = {
         enable = true;
         enableCompletion = true;

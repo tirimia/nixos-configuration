@@ -2,19 +2,15 @@
   pkgs,
   lib,
   config,
-  nixpkgs,
-  username,
-  name,
-  email,
   ...
 }: {
   imports = [];
   options = {};
-  config.home-manager.users.${username} = {
+  config.home-manager.users.${config.target.user} = {
     programs.git = {
       enable = true;
-      userName = name;
-      userEmail = email;
+      userName = "TODO";
+      userEmail = "TODO";
       ignores = [
         ".venv"
         ".idea"

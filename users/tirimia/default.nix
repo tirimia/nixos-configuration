@@ -1,25 +1,24 @@
-args @ {
+{
   self,
   config,
   lib,
   pkgs,
-  home-manager,
+  unstablePkgs,
   ...
 }: let
   username = "tirimia";
   name = "Theodor Irimia";
   email = "theodor.irimia@gmail.com";
-  enhancedArgs = args // {inherit username name email;};
 in {
   imports = [
-    home-manager.nixosModules.default
-    # ../../config/software/i3
-    (import ../../config/software/zsh enhancedArgs)
-    (import ../../config/software/git.nix enhancedArgs)
-    ../../config/software/emacs.nix
+    ../../config/software/zsh
+    ../../config/software/git.nix
+    ../../config/software/emacs
   ];
+
   # TODO: for window manager, actually use a systemd service if we depend on bars and shizz
   # TODO: use xmonad
+  target.user = username;
 
   users.users.${username} = {
     isNormalUser = true;
@@ -30,6 +29,7 @@ in {
   };
   programs.zsh.enable = true;
 
+  nixpkgs.config.allowUnfree = true;
   home-manager = {
     useUserPackages = true;
     useGlobalPkgs = true;
@@ -37,6 +37,10 @@ in {
       home = {
         homeDirectory = "/home/${username}";
         stateVersion = "23.05";
+        packages = with pkgs; [
+          unstablePkgs.megasync # TODO: run as a service
+          _1password
+        ];
       };
       programs.home-manager.enable = true;
     };

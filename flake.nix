@@ -1,6 +1,5 @@
 {
   # TODO: figure out tests and checks
-  # https://github.com/Baitinq/nixos-config/blob/master/flake.nix
   description = "tirimia NixOS configs";
 
   inputs = {
@@ -10,34 +9,56 @@
     home-manager.url = "github:nix-community/home-manager/release-23.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    flake-parts.url = "github:hercules-ci/flake-parts";
-
     nixos-hardware.url = "github:nixos/nixos-hardware"; # Look into getting the fingerprint reader for thinkpads from here
-    emacs.url = "github:nix-community/emacs-overlay";
+    darwin.url = "github:lnl7/nix-darwin";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
-  outputs = {
-    self,
-    nixpkgs,
-    ...
-  } @ attrs: let
-    machines = {
+  outputs = {self, ...} @ attrs: let
+    nixosMachines = {
       stinkpad = {
         system = "x86_64-linux";
       };
+    };
+    darwinMachines = {
+      emwan.system = "aarch64-darwin";
     };
     username = "tirimia";
   in {
     nixosConfigurations =
       builtins.mapAttrs
       (host: config:
-        nixpkgs.lib.nixosSystem {
+        attrs.nixpkgs.lib.nixosSystem {
           system = config.system;
-          specialArgs = attrs;
           modules = [
+            {
+              _module.args.unstablePkgs = import attrs.unstable {
+                inherit (config) system;
+                config.allowUnfree = true;
+              };
+            }
+            attrs.home-manager.nixosModules.default
             ./hosts/${host}
             ./users/${username}
           ];
         })
-      machines;
+      nixosMachines;
+    darwinConfigurations =
+      builtins.mapAttrs
+      (host: config:
+        attrs.darwin.lib.darwinSystem {
+          system = config.system;
+          modules = [
+            {
+              _module.args.unstablePkgs = import attrs.unstable {
+                inherit (config) system;
+                config.allowUnfree = true;
+              };
+              _module.args.user = username;
+            }
+            attrs.home-manager.darwinModules.default
+            ./hosts/emwan
+          ];
+        })
+      darwinMachines;
   };
 }

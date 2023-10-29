@@ -1,5 +1,4 @@
-# TODO: pass hostname as arg
-args @ {
+{
   config,
   lib,
   pkgs,
@@ -10,6 +9,7 @@ args @ {
   imports = [
     ./hardware-configuration.nix
     ../../config/base.nix
+    ../../config/fonts.nix
   ];
 
   networking = {
