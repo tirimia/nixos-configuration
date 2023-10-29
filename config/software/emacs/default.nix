@@ -45,7 +45,6 @@ in {
           gotools
           lua
           just
-          unstablePkgs.nixd
           nodePackages_latest.typescript-language-server
           ruff
           rustc

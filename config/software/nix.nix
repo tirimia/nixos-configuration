@@ -2,13 +2,15 @@
   pkgs,
   lib,
   config,
+  unstablePkgs,
   ...
 }: {
   imports = [];
   options = {};
   config = {
-    environment.systemPackages = with pkgs; [
+    environment.systemPackages = with unstablePkgs; [
       alejandra
+      nixd
     ];
   };
 }
