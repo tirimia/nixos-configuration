@@ -9,12 +9,8 @@
     fonts.fonts = with pkgs; [
       iosevka-comfy.comfy-wide
       intel-one-mono
-      (nerdfonts.override {
-        fonts = [
-          "FiraCode"
-          "SourceCodePro"
-        ];
-      })
+      fira-code
+      source-code-pro
     ];
   };
 }
