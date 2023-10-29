@@ -9,7 +9,7 @@
       (nerdfonts.override {
         fonts = [
           "FiraCode"
-          "IntelOneMono"
+          "IntoneMono"
           "Iosevka"
           "SourceCodePro"
         ];
