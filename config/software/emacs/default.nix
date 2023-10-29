@@ -6,10 +6,10 @@
   ...
 }: let
   myEmacs = pkgs.emacs29;
-  # This generates an emacsWithPackages function. It takes a single
-  # argument: a function from a package set to a list of packages
-  # (the packages that will be available in Emacs).
   emacsWithPackages = (pkgs.emacsPackagesFor myEmacs).emacsWithPackages;
+  myPackages = emacsWithPackages (epkgs: (with epkgs.melpaPackages; [
+    vterm
+  ]));
 in {
   imports = [];
   options = {
@@ -54,9 +54,7 @@ in {
             unstablePkgs.zig
             unstablePkgs.zls
           ]
-          ++ emacsWithPackages (epkgs: (with epkgs.melpaPackages; [
-            vterm
-          ]));
+          ++ myPackages;
       };
     };
   };
