@@ -382,7 +382,7 @@ We only want buffers in the same major mode and visible buffers to be used."
   :config (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :general
   (:states '(motion normal) "C-w" '(ace-window :which-key "Windows"))
-  ("C-x o" '(ace-window :which-key "Switch window")))
+  ("M-o" '(ace-window :which-key "Switch window")))
 
 ;;; Theme
 (setq modus-themes-hl-line (quote (underline)))
