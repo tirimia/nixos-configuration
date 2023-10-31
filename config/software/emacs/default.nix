@@ -30,11 +30,16 @@ in {
           source = ./config;
           recursive = true;
         };
+        # TODO: try to get the libraries to compile straight into emacs
         file.".config/emacs/tree-sitter".source = pkgs.runCommand "grammars" {} ''
-          mkdir -p $out/bin
+          mkdir -p $out
           ${lib.concatStringsSep "\n"
             (lib.mapAttrsToList
-              (name: src: "name=${name}; ln -s ${src}/parser $out/\lib${name}")
+              (name: src: "name=${name}; ln -s ${src}/parser $out/\lib${name}${
+                if pkgs.system == "aarch64-darwin"
+                then ".dylib"
+                else ".so"
+              }")
               pkgs.tree-sitter.builtGrammars)};
         '';
         packages = with pkgs; [
