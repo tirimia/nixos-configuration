@@ -254,8 +254,8 @@
   (corfu-map "RET" nil)
   :custom
   (corfu-auto t)
-  (corfu-auto-delay 0.05)
-  (corfu-auto-prefix 0)
+  (corfu-auto-delay 0.1)
+  (corfu-auto-prefix 2)
   (corfu-quit-no-match 'separator)
   (corfu-on-exact-match nil "Sometimes gets in the way something fierce, needs to be disabled")
   (corfu-cycle t)
