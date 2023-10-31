@@ -4,6 +4,9 @@ ifndef HOSTNAME
 endif
 NIX_REBUILD := sudo nixos-rebuild --flake .\#$(HOSTNAME)
 
+.PHONY: mac-switch
+mac-switch: ; darwin-rebuild switch --flake .
+
 .PHONY: test switch upgrade rollback
 test:		; $(NIX_REBUILD) test
 switch:		; $(NIX_REBUILD) switch

@@ -20,7 +20,10 @@
       };
     };
     darwinMachines = {
-      emwan.system = "aarch64-darwin";
+      Theodor-Irimia-s-MacBook-Pro = {
+        alias = "emwan";
+        system = "aarch64-darwin";
+      };
     };
     username = "tirimia";
   in {
@@ -56,7 +59,7 @@
               _module.args.user = username;
             }
             attrs.home-manager.darwinModules.default
-            ./hosts/emwan
+            ./hosts/${config.alias}
           ];
         })
       darwinMachines;
