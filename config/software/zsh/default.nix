@@ -28,7 +28,7 @@
           setopt always_to_end
           setopt prompt_subst
           setopt share_history
-
+          alias cdr='cd `git rev-parse --show-toplevel`'
               source ~/.config/zsh/powerlevel10k.zsh
         '';
         plugins = [
