@@ -252,6 +252,7 @@
   :general
   (corfu-map "TAB" 'corfu-complete)
   (corfu-map "RET" nil)
+  :bind ("M-/" . completion-at-point)
   :custom
   (corfu-auto t)
   (corfu-auto-delay 0.1)
@@ -314,13 +315,14 @@ We only want buffers in the same major mode and visible buffers to be used."
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   (defun setup-lsp-completion ()
-    (setq-local completion-at-point-functions (list (cape-capf-super #'yasnippet-capf
-                                                                     #'lsp-completion-at-point)
+    (setq-local completion-at-point-functions (list (cape-capf-super
+                                                     #'lsp-completion-at-point
+                                                     #'yasnippet-capf)
                                                     #'cape-file
                                                     #'cape-dabbrev)))
   (defun setup-elisp-completion ()
-    (setq-local completion-at-point-functions (list (cape-capf-super #'yasnippet-capf
-                                                                     #'elisp-completion-at-point)
+    (setq-local completion-at-point-functions (list (cape-capf-super #'elisp-completion-at-point
+                                                                     #'yasnippet-capf)
                                                     #'cape-file
                                                     #'cape-dabbrev)))
   (defun setup-web-completion ()
@@ -609,10 +611,9 @@ We only want buffers in the same major mode and visible buffers to be used."
   "Base configuration for programming LSP enabled languages.
 DOCS will be provided via devdocs if installed."
   (interactive)
-  (with-eval-after-load 'devdocs (setq-local devdocs-current-docs docs))
-  (with-eval-after-load 'lsp
-    (add-hook 'before-save-hook #'lsp-format-buffer t t)
-    (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  (setq-local devdocs-current-docs docs)
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t)
   (lsp-deferred))
 ;;; Elisp
 (use-package aggressive-indent
@@ -707,7 +708,11 @@ DOCS will be provided via devdocs if installed."
   "mh" '(lsp-describe-thing-at-point :which-key "Help") ;; TODO: for some reason this doesn`t work
   "mm" '(rustic-recompile :which-key "Rustic Recompile"))
 ;; TODO: configure installing necessary tools and pacakge
-;; TODO: lsp auto format
+(use-package reformatter
+  :config
+  (reformatter-define prettier-format
+    :program "npx"
+    :args (list "prettier" "--stdin-filepath" (buffer-file-name))))
 ;; TODO: in projects that contain prettierrc, turn on autosave and autorevert in each file
 (use-package typescript-ts-mode
   :straight (:type built-in)
@@ -723,7 +728,10 @@ DOCS will be provided via devdocs if installed."
   (defun tirimia/typescript-setup ()
     "Setup for writing TS"
     (interactive)
-    (tirimia/prog-with-lsp '("typescript" "node~18_lts")))
+    (setq-local devdocs-current-docs '("typescript" "node~18_lts"))
+    (add-hook 'before-save-hook #'lsp-organize-imports t t)
+    (prettier-format-on-save-mode)
+    (lsp-deferred))
   :mode ("\\.ts\\'" "\\.tsx\\'")
   :hook (typescript-ts-mode . tirimia/typescript-setup))
 (tirimia/key-definer
@@ -759,10 +767,6 @@ DOCS will be provided via devdocs if installed."
     :keymaps '(prog-mode-map)
     :major-modes t
     "md" '(devdocs-lookup :which-key "Docs")))
-
-(use-package dtrt-indent
-  :commands (dtrt-indent-global-mode)
-  :config (dtrt-indent-global-mode))
 
 (use-package helpful
   :general
