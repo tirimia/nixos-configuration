@@ -732,10 +732,10 @@ DOCS will be provided via devdocs if installed."
     (add-hook 'before-save-hook #'lsp-organize-imports t t)
     (prettier-format-on-save-mode)
     (lsp-deferred))
-  :mode ("\\.ts\\'" "\\.tsx\\'")
-  :hook (typescript-ts-mode . tirimia/typescript-setup))
+  :mode (("\\.ts\\'" . typescript-ts-mode) ("\\.tsx\\'" . tsx-ts-mode))
+  :hook ((tsx-ts-mode typescript-ts-mode) . tirimia/typescript-setup))
 (tirimia/key-definer
-  :keymaps '(typescript-ts-mode-map)
+  :keymaps '(tsx-ts-mode-map typescript-ts-mode-map)
   :major-modes t
   "m" '(:ignore t :which-key "TypeScript")
   "mc" '(compile :which-key "TS Compile")
