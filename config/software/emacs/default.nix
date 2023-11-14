@@ -43,6 +43,7 @@ in {
               pkgs.tree-sitter.builtGrammars)};
         '';
         packages = with pkgs; [
+          myEmacs
           black
           cargo
           docker
