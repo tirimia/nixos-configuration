@@ -48,7 +48,8 @@
 	native-comp-async-jobs-number 12
 	byte-compile-warnings nil
         package-native-compile t))
-(use-package use-package-ensure-system-package)
+(use-package use-package-ensure-system-package
+  :config (when (eq system-type 'darwin) (add-to-list 'exec-path "/opt/homebrew/bin")))
 
 (use-package org)
 
