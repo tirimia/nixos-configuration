@@ -47,6 +47,7 @@ in {
           black
           cargo
           docker
+          fd
           go
           gofumpt
           golangci-lint
