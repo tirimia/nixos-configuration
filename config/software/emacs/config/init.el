@@ -49,7 +49,9 @@
 	byte-compile-warnings nil
         package-native-compile t))
 (use-package use-package-ensure-system-package
-  :config (when (eq system-type 'darwin) (add-to-list 'exec-path "/opt/homebrew/bin")))
+  :config
+  (add-to-list 'exec-path "/etc/profiles/per-user/tirimia/bin")
+  (when (eq system-type 'darwin) (add-to-list 'exec-path "/opt/homebrew/bin")))
 
 (use-package org)
 
