@@ -375,7 +375,6 @@ We only want buffers in the same major mode and visible buffers to be used."
   :config (flycheck-package-setup))
 (use-package flycheck-golangci-lint
   :after (flycheck go-ts-mode)
-  :ensure-system-package (golangci-lint . "go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest")
   :straight (:host github :repo "forgoty/flycheck-golangci-lint")
   :commands (flycheck-golangci-lint-setup)
   :config
@@ -441,7 +440,6 @@ We only want buffers in the same major mode and visible buffers to be used."
 
 ;;; Magit
 (use-package magit
-  :ensure-system-package git
   :commands (magit-get-current-branch magit-refresh-buffer)
   :config
   (defun tirimia/smart-magit-refresh ()
@@ -517,7 +515,6 @@ We only want buffers in the same major mode and visible buffers to be used."
 (use-package consult
   :commands (consult--file-action)
   :after (projectile)
-  :ensure-system-package (rg . ripgrep)
   :general ("M-g M-g" 'consult-goto-line)
   :custom
   (consult-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --with-filename --line-number --search-zip --hidden --glob=!.git/")
@@ -642,7 +639,6 @@ DOCS will be provided via devdocs if installed."
 
 ;;; Yaml
 (use-package yaml-mode
-  :ensure-system-package yamllint
   :init
   (defun tirimia/yaml-setup ()
     "Function to set up YAML editing."
@@ -658,10 +654,6 @@ DOCS will be provided via devdocs if installed."
   :preface (add-to-list 'exec-path "/Users/tirimia/go/bin")
   :straight (:type built-in)
   :mode "\\.go\\'"
-  :ensure-system-package (go
-                          (gofumpt . "go install mvdan.cc/gofumpt@latest")
-                          (goimports . "go install golang.org/x/tools/cmd/goimports@latest")
-                          (gopls . "go install golang.org/x/tools/gopls@latest"))
   :config
   (defun tirimia/go-setup ()
     "Setup for writing the coolest yet most annoying language"
@@ -901,7 +893,6 @@ DOCS will be provided via devdocs if installed."
   :hook prog-mode)
 ;; TODO: virtualenv for python
 (use-package python
-  :ensure-system-package ruff
   :config (defun tirimia/python-setup ()
             "Setup for writing Python."
             (interactive)
@@ -922,7 +913,6 @@ DOCS will be provided via devdocs if installed."
 
 ;; TODO: move stuff to own directories and libraries to make the config more modular
 (use-package zig-mode
-  :ensure-system-package (zig zls)
   :custom (zig-format-on-save nil)
   :config
   (defun tirimia/zig-setup ()
