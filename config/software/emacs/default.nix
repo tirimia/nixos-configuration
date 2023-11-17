@@ -45,6 +45,7 @@ in {
         packages = with pkgs; [
           myEmacs
           black
+          unstablePkgs.bun
           cargo
           docker
           fd
@@ -56,6 +57,8 @@ in {
           gotools
           lua
           just
+          nodePackages_latest.pnpm
+          nodePackages_latest.typescript
           nodePackages_latest.typescript-language-server
           ruff
           rustc
