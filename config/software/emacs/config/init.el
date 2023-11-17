@@ -822,6 +822,14 @@ DOCS will be provided via devdocs if installed."
 (use-package nix-mode
   :mode "\\.nix\\'"
   :hook (nix-mode . lsp-deferred))
+(tirimia/key-definer
+  :keymaps '(nix-mode-map)
+  :major-modes t
+  "m" '(:ignore t :which-key "Nix")
+  ;; TODO: add a format binding
+  "mr" '(tirimia/compile-in-project-root :which-key "Compile in root")
+  "mm" '(recompile :which-key "Recompile")
+  "mh" '(lsp-describe-thing-at-point :which-key "Help"))
 (add-to-list 'exec-path "/Users/tirimia/.nix-profile/bin")
 (add-to-list 'exec-path "/nix/var/nix/profiles/default/bin")
 ;; TODO: nix devdocs
