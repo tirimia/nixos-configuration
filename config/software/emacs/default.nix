@@ -57,9 +57,12 @@ in {
           gotools
           lua
           just
+          nodejs_20
+          envsubst # TODO: move this to some separate place
           nodePackages_latest.pnpm
           nodePackages_latest.typescript
           nodePackages_latest.typescript-language-server
+          netcat
           ruff
           rustc
           rust-analyzer
