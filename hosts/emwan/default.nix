@@ -7,6 +7,7 @@
 }: {
   imports = [
     ../../config/software/emacs
+    ../../config/software/zsh
   ];
   target.user = user;
   services.nix-daemon.enable = true;
