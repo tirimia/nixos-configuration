@@ -722,6 +722,7 @@ DOCS will be provided via devdocs if installed."
   (lsp-javascript-display-return-type-hints t)
   (lsp-javascript-display-variable-type-hints t)
   (lsp-typescript-surveys-enabled nil)
+  (typescript-ts-mode-indent-offset 4)
   :config
   (defun tirimia/typescript-setup ()
     "Setup for writing TS"
