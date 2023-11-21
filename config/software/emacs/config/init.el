@@ -634,6 +634,7 @@ DOCS will be provided via devdocs if installed."
   :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
   :major-modes t
   "m" '(:ignore t :which-key "Elisp Mode")
+  "mr" '(tirimia/compile-in-project-root :which-key "Compile in root")
   "mx" '(eval-defun :which-key "Eval top")
   "me" '(eval-last-sexp :which-key "Eval-last"))
 (add-hook 'emacs-lisp-mode-hook #'tirimia/elisp-setup)
