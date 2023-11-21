@@ -48,10 +48,12 @@
 	native-comp-async-jobs-number 12
 	byte-compile-warnings nil
         package-native-compile t))
-(use-package use-package-ensure-system-package
+(use-package exec-path-from-shell
+  :commands exec-path-from-shell-initialize
   :config
-  (add-to-list 'exec-path "/etc/profiles/per-user/tirimia/bin")
-  (when (eq system-type 'darwin) (add-to-list 'exec-path "/opt/homebrew/bin")))
+  (when (or (memq window-system '(mac ns x)) (daemonp))
+    (exec-path-from-shell-initialize)))
+(use-package use-package-ensure-system-package)
 
 (use-package org)
 
