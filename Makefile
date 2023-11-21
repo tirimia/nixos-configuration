@@ -16,3 +16,4 @@ rollback:	; $(NIX_REBUILD) rollback
 .PHONY: update-flake
 update-flake: ; nix flake update
 #nixos-rebuild switch --flake /path/to/my-flake#my-machine
+#nix build .#darwinConfigurations.Theodor-Irimia-s-MacBook-Pro.system --extra-experimental-features "nix-command flakes"
