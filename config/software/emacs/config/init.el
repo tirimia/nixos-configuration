@@ -111,6 +111,10 @@
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
 
+(use-package dired
+  :straight (:type built-in)
+  :custom
+  (dired-recursive-copies 'always))
 ;; Addons
 (use-package general
   :commands (general-def general-create-definer tirimia/key-definer)
