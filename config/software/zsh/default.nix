@@ -13,7 +13,7 @@
         enable = true;
         enableCompletion = true;
         enableAutosuggestions = true;
-        enableSyntaxHighlighting = true;
+        syntaxHighlighting.enable = true;
         history = {
           save = 1000000;
           size = 1000000;
@@ -33,13 +33,14 @@
           unsetopt ignore_braces
           unsetopt list_beep
           setopt always_to_end
+          setopt auto_cd
           setopt prompt_subst
           setopt share_history
           # Make the goddamn delete char work
-          bindkey  "^[[3~"          delete-char
-          bindkey  "^[3;5~"         delete-char
-          bindkey  ";3D"         backward-word
-          bindkey  ";3C"         forward-word
+          bindkey  "^[[3~"   delete-char
+          bindkey  "^[3;5~"  delete-char
+          bindkey  ";3D"     backward-word
+          bindkey  ";3C"     forward-word
           # Emacs vterm
           vterm_printf(){
               if [ -n "$TMUX" ] && ([ "''${TERM%%-*}" = "tmux" ] || [ "''${TERM%%-*}" = "screen" ] ); then
@@ -64,6 +65,10 @@
           ff() {
               vterm_cmd find-file "$(realpath "''${@:-.}")"
           }
+
+          zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+          eval "$(direnv hook zsh)"
+
           source ~/.config/zsh/powerlevel10k.zsh
         '';
         plugins = [
@@ -109,7 +114,7 @@
         enableZshIntegration = true;
       };
       home = {
-        packages = [pkgs.zsh-powerlevel10k];
+        packages = with pkgs; [zsh-powerlevel10k direnv];
         file.".config/zsh/powerlevel10k.zsh".source = ./powerlevel10k.zsh;
       };
     };
