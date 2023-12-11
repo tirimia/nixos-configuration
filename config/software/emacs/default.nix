@@ -46,7 +46,7 @@ in {
           myEmacs
           black
           unstablePkgs.bun
-          cargo
+          texliveFull # Needed for org pdf export
           docker
           fd
           go
@@ -57,15 +57,22 @@ in {
           gotools
           lua
           just
-          nodejs_20
+          nodejs_18
           envsubst # TODO: move this to some separate place
+          awscli2
           nodePackages_latest.pnpm
           nodePackages_latest.typescript
           nodePackages_latest.typescript-language-server
           netcat
+          python3
+          python311Packages.packaging
+          python311Packages.python-lsp-server
           ruff
-          rustc
-          rust-analyzer
+          python311Packages.ruff-lsp
+          (unstablePkgs.rust-bin.selectLatestNightlyWith (toolchain:
+            toolchain.default.override {
+              extensions = ["rust-src" "rust-analyzer"];
+            }))
           ripgrep
           unstablePkgs.bun
           terraform-ls

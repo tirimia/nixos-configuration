@@ -8,7 +8,7 @@
       ad-redefinition-action 'accept)
 
 (add-hook 'emacs-startup-hook
-          (lambda () (setq gc-cons-threshold 1000000000
+          (lambda () (setq gc-cons-threshold 100000000
 		      read-process-output-max (* 1024 1024)
 		      gc-cons-percentage 0.1
 		      file-name-handler-alist backup/file-name-handler-alist

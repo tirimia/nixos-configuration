@@ -128,7 +128,8 @@
   (general-create-definer tirimia/key-definer
     :states '(normal visual insert motion emacs)
     :prefix tirimia/leader-key
-    :non-normal-prefix tirimia/alt-leader-key))
+    :non-normal-prefix tirimia/alt-leader-key)
+  (general-define-key "C-c SPC" #'set-mark-command))
 (use-package which-key
   :commands (which-key-mode which-key-enable-god-mode-support)
   :init
@@ -554,10 +555,10 @@ We only want buffers in the same major mode and visible buffers to be used."
   :custom
   (lsp-completion-provider :none)
   (lsp-headerline-breadcrumb-enable nil)
-  (lsp-eldoc-render-all t)
   (lsp-diagnostic-clean-after-change t)
   (lsp-modeline-diagnostics-enable nil)
   (lsp-diagnostics-provider :flycheck)
+  (lsp-signature-render-documentation nil)
   (lsp-disabled-clients '())
   (lsp-semgrep-languages '() "Disable this stupid lsp"))
 
@@ -569,11 +570,8 @@ We only want buffers in the same major mode and visible buffers to be used."
   :config
   (setq-default lsp-ui-sideline-enable nil)
   (setq-default lsp-ui-sideline-show-diagnostics nil)
-  (setq-default lsp-ui-sideline-diagnostic-max-line-length 50)
-  (setq-default lsp-ui-sideline-diagnostic-max-lines 2)
   (setq-default lsp-ui-doc-show-with-cursor nil)
-  (setq-default lsp-ui-doc-show-with-mouse t)
-  (setq-default lsp-ui-doc-delay 1)
+  (setq-default lsp-ui-doc-show-with-mouse nil)
   (setq-default lsp-ui-doc-use-webkit t))
 
 ;; Automatically delete properly
@@ -586,7 +584,7 @@ We only want buffers in the same major mode and visible buffers to be used."
   :config
   (smartparens-global-mode)
   ;; Single quotes are necessary for quoting in emacs and lifetimes in rust
-  (sp-local-pair '(emacs-lisp-mode rust-mode) "'" nil :actions nil)
+  (sp-local-pair '(emacs-lisp-mode rust-mode rustic-mode) "'" nil :actions nil)
   (sp-local-pair '(emacs-lisp-mode) "`" nil :actions nil)
   ;; Web automatically adds them
   (sp-local-pair '(web-mode) "{" nil :actions nil))
@@ -621,6 +619,10 @@ DOCS will be provided via devdocs if installed."
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
   (add-hook 'before-save-hook #'lsp-organize-imports t t)
   (lsp-deferred))
+
+(use-package direnv
+  :commands direnv-mode
+  :config (direnv-mode))
 ;;; Elisp
 (use-package aggressive-indent
   :ghook 'emacs-lisp-mode-hook)
@@ -684,8 +686,7 @@ DOCS will be provided via devdocs if installed."
   "mm" '(recompile :which-key "Go Recompile")
   "mh" '(lsp-describe-thing-at-point :which-key "Help"))
 (use-package rustic
-  :init (setq-default rustic-treesitter-derive t)
-  :straight (:host github :repo "brotzeit/rustic" :branch "rustic-ts-mode")
+  :straight (:host github :repo "brotzeit/rustic")
   :config
   (add-to-list 'exec-path "~/.cargo/bin")
   (defun tirimia/rust-setup ()
@@ -699,7 +700,11 @@ DOCS will be provided via devdocs if installed."
    lsp-rust-analyzer-server-display-inlay-hints t
    lsp-rust-analyzer-cargo-watch-command "clippy"
    lsp-rust-analyzer-import-granularity "crate"
-   lsp-rust-analyzer-display-parameter-hints t)
+   lsp-rust-analyzer-display-parameter-hints t
+   rustic-format-trigger 'on-save)
+  (setq auto-mode-alist (delete '("\\.rs\\'" . rust-mode) auto-mode-alist))
+  (setq auto-mode-alist (delete '("\\.rs\\'" . rust-ts-mode) auto-mode-alist))
+  :mode ("\\.rs\\'" . rustic-mode)
   :hook (rustic-mode . tirimia/rust-setup))
 (tirimia/key-definer
   :keymaps '(rustic-mode-map)
@@ -712,6 +717,7 @@ DOCS will be provided via devdocs if installed."
 ;; TODO: configure installing necessary tools and pacakge
 (use-package reformatter
   :config
+  ;; TODO: find prettier, then biome, then worst case npx prettier
   (reformatter-define prettier-format
     :program "npx"
     :args (list "prettier" "--stdin-filepath" (buffer-file-name))))
@@ -735,8 +741,12 @@ DOCS will be provided via devdocs if installed."
     (add-hook 'before-save-hook #'lsp-organize-imports t t)
     (prettier-format-on-save-mode)
     (lsp-deferred))
+  (defun tirimia/tsx-font-lock-fix ()
+    "TSX TS parser is taking waaay too much memory. Gonna make fontification not happen as often."
+    (setq-local jit-lock-defer-time 0.5))
   :mode (("\\.ts\\'" . typescript-ts-mode) ("\\.tsx\\'" . tsx-ts-mode))
-  :hook ((tsx-ts-mode typescript-ts-mode) . tirimia/typescript-setup))
+  :hook (((tsx-ts-mode typescript-ts-mode) . tirimia/typescript-setup)
+         (tsx-ts-mode . tirimia/tsx-font-lock-fix)))
 (tirimia/key-definer
   :keymaps '(tsx-ts-mode-map typescript-ts-mode-map)
   :major-modes t
@@ -848,25 +858,6 @@ DOCS will be provided via devdocs if installed."
 (use-package treesit
   :straight (:type built-in)
   :custom
-  (treesit-language-source-alist
-   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-     (css "https://github.com/tree-sitter/tree-sitter-css")
-     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-     (go "https://github.com/tree-sitter/tree-sitter-go")
-     (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
-     (html "https://github.com/tree-sitter/tree-sitter-html")
-     (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-     (json "https://github.com/tree-sitter/tree-sitter-json")
-     (make "https://github.com/alemuller/tree-sitter-make")
-     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-     (php "https://github.com/tree-sitter/tree-sitter-php")
-     (python "https://github.com/tree-sitter/tree-sitter-python")
-     (rust "https://github.com/tree-sitter/tree-sitter-rust")
-     (toml "https://github.com/tree-sitter/tree-sitter-toml")
-     (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-     (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-     (yaml "https://github.com/ikatyang/tree-sitter-yaml")
-     (zig "https://github.com/maxxnino/tree-sitter-zig")))
   (major-mode-remap-alist
    '((yaml-mode . yaml-ts-mode)
      (bash-mode . bash-ts-mode)
@@ -874,7 +865,6 @@ DOCS will be provided via devdocs if installed."
      (typescript-mode . typescript-ts-mode)
      (json-mode . json-ts-mode)
      (css-mode . css-ts-mode)
-     (rust-mode . rust-ts-mode)
      (python-mode . python-ts-mode))))
 
 ;; System clipboard
@@ -1392,8 +1382,8 @@ added :around, it goes to capture the respective daily note"
   "ts" '(whitespace-mode :which-key "Whitespace indicators")
   "tt" '(toggle-truncate-lines :which-key "Line wraps")
   "tz" '(darkroom-mode :which-key "Zen mode"))
-;; (use-package tarot-mode
-;;   :straight (:local-repo "~/MEGA/Projects/Emacs/tarot-mode"))
+(use-package tarot-mode
+  :straight (:local-repo "~/MEGA/Projects/Emacs/tarot-mode"))
 (use-package plz)
 (use-package hush
   :straight (:local-repo "~/MEGA/Projects/Emacs/hush"))
