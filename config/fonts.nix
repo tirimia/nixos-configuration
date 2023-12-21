@@ -6,7 +6,7 @@
 }: {
   config = {
     fonts.fontconfig.enable = true;
-    fonts.fonts = with pkgs; [
+    fonts.packages = with pkgs; [
       iosevka-comfy.comfy-wide
       intel-one-mono
       fira-code
