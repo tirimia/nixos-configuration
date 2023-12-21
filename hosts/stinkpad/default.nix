@@ -39,6 +39,7 @@
     };
   };
 
+  programs.direnv.enable = true;
   services.xserver = {
     enable = true;
     layout = "de";
@@ -75,9 +76,14 @@
     settings.PasswordAuthentication = true;
   };
 
+  virtualisation.docker.enable = true;
+
   environment.systemPackages = with pkgs; [
+    firefox
     vim
+    usbutils
+    arandr
   ];
 
-  system.stateVersion = "23.05";
+  system.stateVersion = "23.11";
 }

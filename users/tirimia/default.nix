@@ -36,7 +36,7 @@ in {
     users.${username} = {
       home = {
         homeDirectory = "/home/${username}";
-        stateVersion = "23.05";
+        stateVersion = "23.11";
         packages = with pkgs; [
           unstablePkgs.megasync # TODO: run as a service
           _1password
