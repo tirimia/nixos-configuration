@@ -21,6 +21,9 @@
         dotDir = ".config/zsh";
         shellAliases = {
           cdr = "cd `git rev-parse --show-toplevel`";
+          gs = "git status";
+          gap = "git add -p";
+          gcm = "git commit -m";
         };
         initExtra = ''
           if [[ -r "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh" ]]; then
