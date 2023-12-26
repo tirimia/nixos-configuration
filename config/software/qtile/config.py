@@ -1,4 +1,5 @@
 import subprocess
+from os import path
 
 import psutil
 from libqtile import bar, hook, layout, widget
@@ -35,14 +36,8 @@ def get_num_monitors():
     else:
         return num_monitors
 
-
-@hook.subscribe.startup_once
-def startup_once():
-    subprocess.run(["/home/tirimia/Scripts/startup.sh"])
-
-
 # Workspaces
-groups = [Group(name) for name in ["www", "emacs", "youtube"]]
+groups = [Group(name) for name in ["www", "emacs", "media"]]
 # TODO: configure scratchpad dropdown group for emacs agenda in alacritty
 
 # Layouts
@@ -140,7 +135,7 @@ keys = [
         [mod],
         "0",
         # TODO: move scripts here, use lazy.run_extension(extension.CommandSet https://github.com/zordsdavini/qtile-config/blob/eacda219cebe357c46c3708f419f86bb585d4397/config.py#L274
-        lazy.spawn("/home/tirimia/Scripts/mastermenu.sh"),
+        lazy.spawn(path.expanduser("~/.config/mastermenu/main.sh")),
         desc="Master menu",
     ),
     Key(
