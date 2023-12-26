@@ -68,6 +68,9 @@
           ff() {
               vterm_cmd find-file "$(realpath "''${@:-.}")"
           }
+          nix-sha() {
+              nix hash to-sri --type sha256 $(nix-prefetch-url $1)
+          }
 
           zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
           eval "$(direnv hook zsh)"

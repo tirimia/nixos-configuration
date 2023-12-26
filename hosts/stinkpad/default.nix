@@ -72,7 +72,6 @@
     pulse.enable = true;
   };
 
-  nixpkgs.config.allowUnfree = true;
   services.openssh = {
     enable = true;
     settings.PasswordAuthentication = true;
