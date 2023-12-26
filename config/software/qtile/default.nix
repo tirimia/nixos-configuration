@@ -13,8 +13,15 @@
         playerctl
         rofi
       ];
-      services.network-manager-applet.enable = true;
-      services.pasystray.enable = true;
+    };
+    programs.nm-applet.enable = true;
+    # services.pasystray.enable = true; # does not work, manual implementation below
+    systemd.user.services.pasystray = {
+      enable = true;
+      description = "Pulse audio systray";
+      wantedBy = ["graphical-session.target"];
+      partOf = ["graphical-session.target"];
+      serviceConfig.ExecStart = "${pkgs.pasystray}/bin/pasystray";
     };
     services.xserver.displayManager.defaultSession = "none+qtile";
     services.xserver.windowManager.qtile = {
