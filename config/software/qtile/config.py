@@ -1,17 +1,16 @@
-import subprocess
 from os import path
 
-import psutil
-from libqtile import bar, hook, layout, widget
+from libqtile import bar, layout, widget
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.log_utils import logger
+from qtile_extras import widget as widget_extra
 from Xlib import display as xdisplay
 
 # constants
 mod = "mod4"
 terminal = "alacritty"
-date_format = "%T - %a | %Y-%m-%d"
+date_format = "%T|%Y-%m-%d"
 
 
 def get_num_monitors():
@@ -77,17 +76,20 @@ primary_bar = bar.Bar(
         # widget.Spacer(),
         # MAYBE: hide system info in a WidgetBox
         widget.Prompt(),
-        widget.TextBox(fmt="CPU:"),
-        widget.CPUGraph(),
-        widget.TextBox(fmt="RAM:"),
-        widget.MemoryGraph(),
+        widget.CPU(format='CPU:{load_percent}%'),
+        widget.Sep(),
+        widget.Memory(format='RAM:{MemUsed:.0f}{mm}/{MemTotal:.0f}{mm}',measure_mem='G'),
+        widget.Sep(),
         widget.ThermalZone(
             zone="/sys/class/thermal/thermal_zone2/temp",
             format_crit="{temp}°C !!",
             high=80,
         ),
-        widget.Battery(),
+        widget.Sep(),
+        widget.Battery(format='BAT: {char} {percent:2.0%} {hour:d}:{min:02d}'),
+        widget.Sep(),
         widget.Clock(format=date_format),
+        widget.Sep(),
         widget.Systray(),
     ],
     size=bar_height,
