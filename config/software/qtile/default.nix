@@ -10,18 +10,18 @@
       home.file.".config/qtile/config.py".source = ./config.py;
       home.packages = with pkgs; [
         alsa-utils
+        pavucontrol
         playerctl
         rofi
       ];
     };
     programs.nm-applet.enable = true;
-    # services.pasystray.enable = true; # does not work, manual implementation below
-    systemd.user.services.pasystray = {
+    systemd.user.services.pa-applet = {
       enable = true;
-      description = "Pulse audio systray";
+      description = "Pulse audio applet";
       wantedBy = ["graphical-session.target"];
       partOf = ["graphical-session.target"];
-      serviceConfig.ExecStart = "${pkgs.pasystray}/bin/pasystray";
+      serviceConfig.ExecStart = "${pkgs.pa_applet}/bin/pa-applet";
     };
     services.xserver.displayManager.defaultSession = "none+qtile";
     services.xserver.windowManager.qtile = {
