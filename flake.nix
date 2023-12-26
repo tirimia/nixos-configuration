@@ -17,7 +17,6 @@
   outputs = {self, ...} @ attrs: let
     overlays = [
       (import attrs.rust-overlay)
-      (import config/software/dwm/overlay.nix)
     ];
     nixosMachines = {
       stinkpad = {
