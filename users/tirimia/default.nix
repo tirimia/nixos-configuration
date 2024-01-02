@@ -34,7 +34,7 @@ in {
     users.${username} = {
       home = {
         homeDirectory = "/home/${username}";
-        stateVersion = "23.11";
+        stateVersion = "24.05";
         packages = with pkgs; [
           megasync # TODO: run as a service
           _1password

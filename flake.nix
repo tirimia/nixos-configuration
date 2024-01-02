@@ -5,7 +5,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/release-23.11";
+    home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     rust-overlay.url = "github:oxalica/rust-overlay";
@@ -31,21 +31,20 @@
     };
     username = "tirimia";
     systems = ["aarch64-darwin" "x86_64-linux"];
+    pkgsFor = system:
+      import attrs.nixpkgs {
+        inherit overlays system;
+        config.allowUnfree = true;
+      };
   in {
     formatter = attrs.nixpkgs.lib.attrsets.genAttrs systems (
       system: (import attrs.nixpkgs {inherit system;}).alejandra
     );
     nixosConfigurations =
       builtins.mapAttrs
-      (host: config: let
-        pkgs = import attrs.nixpkgs {
-          inherit (config) system;
-          inherit overlays;
-          config.allowUnfree = true;
-        };
-      in
+      (host: config:
         attrs.nixpkgs.lib.nixosSystem {
-          inherit pkgs;
+          pkgs = pkgsFor config.system;
           system = config.system;
           modules = [
             attrs.home-manager.nixosModules.default
@@ -58,14 +57,10 @@
       builtins.mapAttrs
       (host: config:
         attrs.darwin.lib.darwinSystem {
+          pkgs = pkgsFor config.system;
           system = config.system;
           modules = [
             {
-              _module.args.pkgs = import attrs.nixpkgs {
-                inherit (config) system;
-                inherit overlays;
-                config.allowUnfree = true;
-              };
               _module.args.user = username;
             }
             attrs.home-manager.darwinModules.default

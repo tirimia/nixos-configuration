@@ -24,7 +24,7 @@
     users.${user} = {
       home = {
         packages = [pkgs.jq];
-        stateVersion = "23.05";
+        stateVersion = "24.05";
       };
     };
   };
