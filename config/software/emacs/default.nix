@@ -44,6 +44,7 @@ in {
         '';
         packages = with pkgs; [
           myEmacs
+          actionlint
           black
           unstablePkgs.bun
           texliveFull # Needed for org pdf export
