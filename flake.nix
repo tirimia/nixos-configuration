@@ -29,7 +29,11 @@
       };
     };
     username = "tirimia";
+    systems = ["aarch64-darwin" "x86_64-linux"];
   in {
+    formatter = attrs.nixpkgs.lib.attrsets.genAttrs systems (
+      system: (import attrs.nixpkgs {inherit system;}).alejandra
+    );
     nixosConfigurations =
       builtins.mapAttrs
       (host: config:

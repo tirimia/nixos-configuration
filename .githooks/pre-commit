@@ -1,1 +1,1 @@
-alejandra .
+git diff --name-only --cached | xargs nix fmt | awk '/Formatted/{print $2}' | xargs git add
