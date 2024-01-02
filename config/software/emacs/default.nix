@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  unstablePkgs,
   ...
 }: let
   myBaseEmacs = pkgs.emacs29;
@@ -46,7 +45,7 @@ in {
           myEmacs
           actionlint
           black
-          unstablePkgs.bun
+          bun
           texliveFull # Needed for org pdf export
           docker
           fd
@@ -70,16 +69,16 @@ in {
           python311Packages.python-lsp-server
           ruff
           python311Packages.ruff-lsp
-          (unstablePkgs.rust-bin.selectLatestNightlyWith (toolchain:
+          (rust-bin.selectLatestNightlyWith (toolchain:
             toolchain.default.override {
               extensions = ["rust-src" "rust-analyzer"];
             }))
           ripgrep
-          unstablePkgs.bun
+          bun
           terraform-ls
           yamllint
-          unstablePkgs.zig
-          unstablePkgs.zls
+          zig
+          zls
         ];
       };
     };

@@ -10,6 +10,7 @@
     ./hardware-configuration.nix
     ../../config/base.nix
     ../../config/fonts.nix
+    ../../config/software/qtile
   ];
 
   networking = {
@@ -50,13 +51,9 @@
     layout = "de";
     xkbVariant = "";
     displayManager = {
-      defaultSession = "none+i3";
       lightdm.enable = true;
     };
     # TODO: replace with a real window manager
-    windowManager = {
-      i3.enable = true;
-    };
     videoDrivers = ["intel"];
     deviceSection = ''
       Option "DRI" "2"
@@ -75,7 +72,6 @@
     pulse.enable = true;
   };
 
-  nixpkgs.config.allowUnfree = true;
   services.openssh = {
     enable = true;
     settings.PasswordAuthentication = true;

@@ -9,7 +9,7 @@ mac-switch: ; darwin-rebuild switch --flake .
 
 .PHONY: test switch upgrade rollback
 test:		; $(NIX_REBUILD) test
-switch:		; $(NIX_REBUILD) switch
+switch:		; $(NIX_REBUILD) switch # Take name as argument, worst case timestamp - ooor, format name of last commit if on clean tree
 upgrade:	; $(NIX_REBUILD) upgrade
 rollback:	; $(NIX_REBUILD) rollback
 

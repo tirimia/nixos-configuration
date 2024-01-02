@@ -3,7 +3,6 @@
   config,
   lib,
   pkgs,
-  unstablePkgs,
   ...
 }: let
   username = "tirimia";
@@ -29,7 +28,6 @@ in {
   };
   programs.zsh.enable = true;
 
-  nixpkgs.config.allowUnfree = true;
   home-manager = {
     useUserPackages = true;
     useGlobalPkgs = true;
@@ -38,7 +36,7 @@ in {
         homeDirectory = "/home/${username}";
         stateVersion = "23.11";
         packages = with pkgs; [
-          unstablePkgs.megasync # TODO: run as a service
+          megasync # TODO: run as a service
           _1password
         ];
       };
