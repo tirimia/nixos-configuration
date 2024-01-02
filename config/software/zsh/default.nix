@@ -29,6 +29,7 @@
           if [[ -r "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh" ]]; then
             source "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh"
           fi
+          source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh # MacOS fix
           autoload -Uz promptinit colors
           promptinit
           unsetopt beep
