@@ -23,6 +23,7 @@
     useGlobalPkgs = true;
     users.${user} = {
       home = {
+        packages = [pkgs.jq];
         stateVersion = "23.05";
       };
     };
