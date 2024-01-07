@@ -831,7 +831,14 @@ DOCS will be provided via devdocs if installed."
 ;; Nix
 (use-package nix-mode
   :mode "\\.nix\\'"
-  :hook (nix-mode . lsp-deferred))
+  :config
+  (defun tirimia/nix-setup ()
+    "Setup for writing Nix."
+    (interactive)
+    (setq-local devdocs-current-docs '("nix"))
+    (flycheck-add-next-checker 'lsp 'nix t)
+    (lsp-deferred))
+  :hook (nix-mode . tirimia/nix-setup))
 (tirimia/key-definer
   :keymaps '(nix-mode-map)
   :major-modes t

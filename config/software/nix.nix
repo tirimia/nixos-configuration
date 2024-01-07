@@ -9,6 +9,7 @@
   config = {
     environment.systemPackages = with pkgs; [
       alejandra
+      nix-linter
       nixd
     ];
   };

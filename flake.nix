@@ -13,11 +13,15 @@
     nixos-hardware.url = "github:nixos/nixos-hardware"; # Look into getting the fingerprint reader for thinkpads from here
     darwin.url = "github:lnl7/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Other versions are broken
+    nix-linter.url = "github:NixOS/nixpkgs/4c3c80df545ec5cb26b5480979c3e3f93518cbe5";
   };
-  outputs = {self, ...} @ attrs: let
-    overlays = [
-      (import attrs.rust-overlay)
-    ];
+  outputs = {
+    self,
+    darwin,
+    ...
+  } @ attrs: let
     nixosMachines = {
       stinkpad = {
         system = "x86_64-linux";
@@ -33,7 +37,13 @@
     systems = ["aarch64-darwin" "x86_64-linux"];
     pkgsFor = system:
       import attrs.nixpkgs {
-        inherit overlays system;
+        overlays = [
+          (import attrs.rust-overlay)
+          (final: prev: {
+            inherit (attrs.nix-linter.legacyPackages.${system}) nix-linter;
+          })
+        ];
+        inherit system;
         config.allowUnfree = true;
       };
   in {
@@ -45,7 +55,7 @@
       (host: config:
         attrs.nixpkgs.lib.nixosSystem {
           pkgs = pkgsFor config.system;
-          system = config.system;
+          inherit (config) system;
           modules = [
             attrs.home-manager.nixosModules.default
             ./hosts/${host}
@@ -58,7 +68,7 @@
       (host: config:
         attrs.darwin.lib.darwinSystem {
           pkgs = pkgsFor config.system;
-          system = config.system;
+          inherit (config) system;
           modules = [
             {
               _module.args.user = username;

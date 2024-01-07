@@ -7,6 +7,7 @@
 }: {
   imports = [
     ../../config/software/emacs
+    ../../config/software/nix.nix
     ../../config/software/zsh
   ];
   target.user = user;
