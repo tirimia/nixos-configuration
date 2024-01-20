@@ -17,11 +17,7 @@
     # Other versions are broken
     nix-linter.url = "github:NixOS/nixpkgs/4c3c80df545ec5cb26b5480979c3e3f93518cbe5";
   };
-  outputs = {
-    self,
-    darwin,
-    ...
-  } @ attrs: let
+  outputs = {self, ...} @ inputs: let
     nixosMachines = {
       stinkpad = {
         system = "x86_64-linux";
@@ -36,28 +32,28 @@
     username = "tirimia";
     systems = ["aarch64-darwin" "x86_64-linux"];
     pkgsFor = system:
-      import attrs.nixpkgs {
+      import inputs.nixpkgs {
         overlays = [
-          (import attrs.rust-overlay)
+          (import inputs.rust-overlay)
           (final: prev: {
-            inherit (attrs.nix-linter.legacyPackages.${system}) nix-linter;
+            inherit (inputs.nix-linter.legacyPackages.${system}) nix-linter;
           })
         ];
         inherit system;
         config.allowUnfree = true;
       };
   in {
-    formatter = attrs.nixpkgs.lib.attrsets.genAttrs systems (
-      system: (import attrs.nixpkgs {inherit system;}).alejandra
+    formatter = inputs.nixpkgs.lib.attrsets.genAttrs systems (
+      system: (import inputs.nixpkgs {inherit system;}).alejandra
     );
     nixosConfigurations =
       builtins.mapAttrs
       (host: config:
-        attrs.nixpkgs.lib.nixosSystem {
+        inputs.nixpkgs.lib.nixosSystem {
           pkgs = pkgsFor config.system;
           inherit (config) system;
           modules = [
-            attrs.home-manager.nixosModules.default
+            inputs.home-manager.nixosModules.default
             ./hosts/${host}
             ./users/${username}
           ];
@@ -66,14 +62,14 @@
     darwinConfigurations =
       builtins.mapAttrs
       (host: config:
-        attrs.darwin.lib.darwinSystem {
+        inputs.darwin.lib.darwinSystem {
           pkgs = pkgsFor config.system;
           inherit (config) system;
           modules = [
             {
               _module.args.user = username;
             }
-            attrs.home-manager.darwinModules.default
+            inputs.home-manager.darwinModules.default
             ./hosts/${config.alias}
           ];
         })
