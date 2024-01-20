@@ -247,7 +247,7 @@
   (evil-exchange-install))
 (use-package evil-collection
   :commands (evil-collection-init)
-  :config (evil-collection-init '(calc org)))
+  :config (evil-collection-init '(calc org magit vterm)))
 
 ;; TODO: consider using the default mode line but modded
 (use-package mood-line
