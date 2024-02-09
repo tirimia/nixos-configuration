@@ -114,6 +114,12 @@
             src = pkgs.zsh-completions;
             file = "share/zsh-completions/zsh-completions.plugin.zsh";
           }
+
+          {
+            name = "nix-zsh-completions";
+            src = pkgs.nix-zsh-completions;
+            file = "share/nix-zsh-completions/nix-zsh-completions.plugin.zsh";
+          }
         ];
       };
       programs.fzf = {
