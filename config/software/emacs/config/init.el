@@ -700,8 +700,7 @@ DOCS will be provided via devdocs if installed."
    lsp-rust-analyzer-server-display-inlay-hints t
    lsp-rust-analyzer-cargo-watch-command "clippy"
    lsp-rust-analyzer-import-granularity "crate"
-   lsp-rust-analyzer-display-parameter-hints t
-   rustic-format-trigger 'on-save)
+   lsp-rust-analyzer-display-parameter-hints t)
   (setq auto-mode-alist (delete '("\\.rs\\'" . rust-mode) auto-mode-alist))
   (setq auto-mode-alist (delete '("\\.rs\\'" . rust-ts-mode) auto-mode-alist))
   :mode ("\\.rs\\'" . rustic-mode)
