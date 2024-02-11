@@ -7,7 +7,6 @@
 }: let
   username = "tirimia";
   name = "Theodor Irimia";
-  email = "theodor.irimia@gmail.com";
 in {
   imports = [
     ../../config/software/zsh
@@ -15,8 +14,6 @@ in {
     ../../config/software/emacs
   ];
 
-  # TODO: for window manager, actually use a systemd service if we depend on bars and shizz
-  # TODO: use xmonad
   target.user = username;
 
   users.users.${username} = {

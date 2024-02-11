@@ -17,7 +17,7 @@
     # Other versions are broken
     nix-linter.url = "github:NixOS/nixpkgs/4c3c80df545ec5cb26b5480979c3e3f93518cbe5";
   };
-  outputs = {self, ...} @ inputs: let
+  outputs = inputs: let
     nixosMachines = {
       stinkpad = {
         system = "x86_64-linux";
