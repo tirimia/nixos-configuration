@@ -39,6 +39,13 @@
           helper = "osxkeychain";
         };
       };
+      includes = [
+        {
+          path = "~/work/.gitconfig";
+          condition = "gitdir:~/work";
+        }
+      ];
     };
+    home.file."work/.gitconfig".text = '''';
   };
 }
