@@ -16,10 +16,16 @@
         ".idea"
       ];
       extraConfig = {
+        core = {
+          untrackedcache = true;
+          fsmonitor = true;
+        };
         pull = {
           ff = "only";
           rebase = false;
         };
+        rerere.enabled = true; # Reuse conflic resolution
+
         push = {
           autoSetupRemote = true;
         };
