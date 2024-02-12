@@ -7,6 +7,7 @@
 }: {
   imports = [
     ../../config/software/emacs
+    ../../config/software/git.nix
     ../../config/software/nix.nix
     ../../config/software/zsh
   ];
