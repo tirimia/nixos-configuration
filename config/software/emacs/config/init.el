@@ -647,6 +647,9 @@ DOCS will be provided via devdocs if installed."
 (add-hook 'lisp-interaction-mode-hook #'tirimia/elisp-setup)
 
 ;;; Yaml
+(use-package yaml
+  ;; elisp based yaml parser
+  )
 (use-package yaml-mode
   :init
   (defun tirimia/yaml-setup ()
@@ -962,6 +965,17 @@ DOCS will be provided via devdocs if installed."
 
 ;; (let (completion-extra-properties '(:annotation-function tirimia/simple-annotation-function))
 ;; (alloc-id (completing-read "Backend alloc: " (mapcar #'tirimia/first-word-and-rest jobs))))
+(defun tirimia/yaml-to-json-buffer ()
+  "Take yaml buffer and turn to JSON.
+;; TODO: make it mode dependent, switch modes after."
+  (interactive)
+  (let* ((content (yaml-parse-string (buffer-string) :object-key-type 'string))
+         (new-content (with-temp-buffer
+                        (json-insert content)
+                        (json-pretty-print-buffer)
+                        (buffer-string))))
+    (erase-buffer)
+    (insert new-content)))
 
 (defun tirimia/ssh-block-to-oneline ()
   "With a block format public key in the kill ring, insert the oneline version"
