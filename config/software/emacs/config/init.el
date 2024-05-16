@@ -863,7 +863,21 @@ DOCS will be provided via devdocs if installed."
                                        (lsp-configuration-section "nixd"))))
                   :synchronize-sections '("nixd")
                   :server-id 'nix-nixd))
-
+(use-package lsp-haskell
+  :config
+  (defun tirimia/haskell-setup ()
+    "Setup for Haskell."
+    (interactive)
+    (tirimia/prog-with-lsp "haskell~9"))
+  :hook (haskell-mode . tirimia/haskell-setup))
+(tirimia/key-definer
+  :keymaps '(haskell-mode-map)
+  :major-modes t
+  "m" '(:ignore t :which-key "Haskell")
+  "mc" '(compile :which-key "Compile")
+  "mr" '(tirimia/compile-in-project-root :which-key "Compile in root")
+  "mm" '(recompile :which-key "Recompile")
+  "mh" '(lsp-describe-thing-at-point :which-key "Help"))
 (use-package treesit
   :straight (:type built-in)
   :custom
