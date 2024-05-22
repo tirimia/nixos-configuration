@@ -339,14 +339,18 @@ We only want buffers in the same major mode and visible buffers to be used."
     (setq-local completion-at-point-functions (list  #'yasnippet-capf
                                                      #'cape-file
                                                      #'cape-dabbrev)))
+  (defun setup-tex-completion ()
+    (setq-local completion-at-point-functions (list  #'yasnippet-capf
+                                                     #'cape-file
+                                                     #'cape-dabbrev)))
   (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
   ;; Lsp is not playing nicely with corfu and leads to it hanging, this fixes it https://github.com/minad/corfu/issues/188#issuecomment-1148658471
   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
   :hook
   (emacs-lisp-mode     . setup-elisp-completion)
   (lsp-completion-mode . setup-lsp-completion)
-  (web-mode . setup-web-completion))
-
+  (web-mode . setup-web-completion)
+  (latex-mode . setup-tex-completion))
 
 ;;; Linting
 (use-package flycheck
