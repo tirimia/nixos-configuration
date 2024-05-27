@@ -1,5 +1,4 @@
 {
-  self,
   config,
   lib,
   pkgs,
@@ -7,6 +6,17 @@
 }: let
   username = "tirimia";
   name = "Theodor Irimia";
+  graphicalService = Description: pkg: pkgCommand: {
+    Unit = {
+      inherit Description;
+      After = ["graphical-session-pre.target"];
+      PartOf = ["graphical-session.target"];
+    };
+    Service = {
+      ExecStart = "${pkg}/bin/${pkgCommand}";
+    };
+    Install.WantedBy = ["graphical-session.target"];
+  };
 in {
   imports = [
     ../../config/software/zsh
@@ -42,22 +52,13 @@ in {
         packages = with pkgs; [
           _1password
           _1password-gui
+          thunderbird
         ];
       };
       programs.home-manager.enable = true;
       services.megasync.enable = true;
-      systemd.user.services._1password = {
-        Unit = {
-          Description = "1Password system tray";
-          After = ["graphical-session-pre.target"];
-          PartOf = ["graphical-session.target"];
-        };
-        Service = {
-          Environment = ["PATH=${lib.makeBinPath [pkgs._1password-gui]}"];
-          ExecStart = "${pkgs._1password-gui}/bin/1password --silent";
-        };
-        Install.WantedBy = ["graphical-session.target"];
-      };
+      systemd.user.services.birdtray = graphicalService "Thunderbird system tray" pkgs.birdtray "birdtray";
+      systemd.user.services._1password = graphicalService "1Password system tray" pkgs._1password-gui "1password --silent";
     };
   };
 }
