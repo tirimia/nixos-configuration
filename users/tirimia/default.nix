@@ -40,12 +40,24 @@ in {
         homeDirectory = "/home/${username}";
         stateVersion = "24.05";
         packages = with pkgs; [
-          megasync # TODO: run as a service
           _1password
           _1password-gui
         ];
       };
       programs.home-manager.enable = true;
+      services.megasync.enable = true;
+      systemd.user.services._1password = {
+        Unit = {
+          Description = "1Password system tray";
+          After = ["graphical-session-pre.target"];
+          PartOf = ["graphical-session.target"];
+        };
+        Service = {
+          Environment = ["PATH=${lib.makeBinPath [pkgs._1password-gui]}"];
+          ExecStart = "${pkgs._1password-gui}/bin/1password --silent";
+        };
+        Install.WantedBy = ["graphical-session.target"];
+      };
     };
   };
 }
