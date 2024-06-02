@@ -42,6 +42,9 @@
         inherit system;
         config.allowUnfree = true;
       };
+    flakeNixPathModule = args: {
+      nix.nixPath = ["nixpkgs=${inputs.nixpkgs.outPath}"];
+    };
   in {
     formatter = inputs.nixpkgs.lib.attrsets.genAttrs systems (
       system: (import inputs.nixpkgs {inherit system;}).alejandra
@@ -54,6 +57,7 @@
           inherit (config) system;
           modules = [
             inputs.home-manager.nixosModules.default
+            flakeNixPathModule
             ./hosts/${host}
             ./users/${username}
           ];
@@ -70,6 +74,7 @@
               _module.args.user = username;
             }
             inputs.home-manager.darwinModules.default
+            flakeNixPathModule
             ./hosts/${config.alias}
           ];
         })
