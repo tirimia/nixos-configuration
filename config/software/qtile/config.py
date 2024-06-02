@@ -39,6 +39,13 @@ def get_num_monitors():
 groups = [Group(name) for name in ["www", "emacs", "media"]]
 # TODO: configure scratchpad dropdown group for emacs agenda in alacritty
 
+def switch_to_nth_group(n):
+    @lazy.function
+    def __inner(qtile):
+        if 0 < n <= len(qtile.groups):
+            qtile.groups[n - 1].toscreen()
+    return __inner
+
 # Layouts
 ## TODO: layout_themes
 layout_theme = {
@@ -171,6 +178,10 @@ keys = [
         desc="Previous track",
     ),
 ]
+
+for i in range(1, 10):
+    keys.append(Key([mod], str(i), switch_to_nth_group(i)))
+
 
 # Drag floating layouts.
 mouse = [
