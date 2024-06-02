@@ -27,9 +27,11 @@
         };
         initExtra = ''
           if [[ -r "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh" ]]; then
-            source "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh"
+             source "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh"
           fi
-          source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh # MacOS fix
+          if [[ $(uname) == "Darwin" ]]; then
+             source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh # MacOS fix
+          fi
           autoload -Uz promptinit colors
           promptinit
           unsetopt beep
