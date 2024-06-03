@@ -9,7 +9,6 @@
   imports = [
     ./hardware-configuration.nix
     ../../config/base.nix
-    ../../config/fonts.nix
     ../../config/software/qtile
   ];
 

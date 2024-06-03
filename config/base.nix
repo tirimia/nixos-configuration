@@ -6,6 +6,7 @@
 }: {
   imports = [
     ./software/nix.nix
+    ./fonts.nix
   ];
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
