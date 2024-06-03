@@ -24,7 +24,7 @@
       };
     };
     darwinMachines = {
-      Theodor-Irimia-s-MacBook-Pro = {
+      trv3692 = {
         alias = "emwan";
         system = "aarch64-darwin";
       };
