@@ -19,6 +19,9 @@
   system.defaults = {
     dock.autohide = true;
   };
+
+  security.pam.enableSudoTouchIdAuth = true;
+
   users.users.${user}.home = "/Users/${user}";
   home-manager = {
     useUserPackages = true;
