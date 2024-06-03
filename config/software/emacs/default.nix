@@ -43,6 +43,9 @@ in {
         '';
         packages = with pkgs; [
           myEmacs
+          # TODO: make this a separate derivation for libvterm, see https://weblog.zamazal.org/sw-problem-nixos-emacs-vterm/
+          cmake
+          libvterm-neovim
           actionlint
           black
           bun
