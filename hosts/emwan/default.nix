@@ -20,6 +20,9 @@
     dock.autohide = true;
   };
 
+  fonts.fontDir.enable = true;
+  fonts.fonts = import ../../config/fonts.nix {inherit pkgs;};
+
   security.pam.enableSudoTouchIdAuth = true;
 
   users.users.${user}.home = "/Users/${user}";

@@ -76,6 +76,8 @@
     settings.PasswordAuthentication = true;
   };
 
+  fonts.packages = import ../../config/fonts.nix {inherit pkgs;};
+
   virtualisation.docker.enable = true;
 
   environment.systemPackages = with pkgs; [
