@@ -6,9 +6,9 @@
 }: let
   myBaseEmacs = pkgs.emacs29;
   emacsWithPackages = (pkgs.emacsPackagesFor myBaseEmacs).emacsWithPackages;
-  myEmacs = emacsWithPackages (epkgs: (with epkgs; [
-    melpaPackages.vterm
-  ]));
+  myEmacs =
+    emacsWithPackages (epkgs: (with epkgs; [
+      ]));
 in {
   imports = [];
   options = {
