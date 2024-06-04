@@ -106,7 +106,7 @@
 (use-package default-text-scale
   :commands (default-text-scale-mode)
   :config (default-text-scale-mode))
-(add-to-list 'default-frame-alist '(font . "Iosevka Comfy Wide:pixelsize=22:weight=medium:slant=normal:width=normal:spacing=100:scalable=true"))
+(add-to-list 'default-frame-alist '(font . "Iosevka Comfy Wide:pixelsize=16:weight=medium:slant=normal:width=normal:spacing=100:scalable=true"))
 ;;; Increase and decrease fonts like in normal editors
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
