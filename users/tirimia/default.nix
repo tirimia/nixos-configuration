@@ -33,7 +33,6 @@ in {
     extraGroups = ["wheel" "networkmanager" "libvirtd" "docker" "tty"];
     shell = pkgs.zsh;
   };
-  programs.zsh.enable = true;
   programs._1password.enable = true;
   programs._1password-gui = {
     enable = true;

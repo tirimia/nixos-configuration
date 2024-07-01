@@ -835,6 +835,7 @@ DOCS will be provided via devdocs if installed."
 (use-package request)
 (use-package know-your-http-well)
 ;; Nix
+;; TODO: make it automatically add semicolons, abbrev or pair mode
 (use-package nix-mode
   :mode "\\.nix\\'"
   :config
@@ -1420,8 +1421,8 @@ added :around, it goes to capture the respective daily note"
   "ts" '(whitespace-mode :which-key "Whitespace indicators")
   "tt" '(toggle-truncate-lines :which-key "Line wraps")
   "tz" '(darkroom-mode :which-key "Zen mode"))
-(use-package tarot-mode
-  :straight (:local-repo "~/MEGA/Projects/Emacs/tarot-mode"))
+;; (use-package tarot-mode
+;;   :straight (:local-repo "~/MEGA/Projects/Emacs/tarot-mode"))
 (use-package plz)
 (use-package hush
   :straight (:local-repo "~/MEGA/Projects/Emacs/hush"))

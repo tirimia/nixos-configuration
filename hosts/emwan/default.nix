@@ -20,6 +20,11 @@
     dock.autohide = true;
   };
 
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   fonts.fontDir.enable = true;
   fonts.fonts = import ../../config/fonts.nix {inherit pkgs;};
 

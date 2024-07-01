@@ -4,11 +4,10 @@
   pkgs,
   ...
 }: let
-  myBaseEmacs = pkgs.emacs29;
+  vterm-deps = [pkgs.cmake pkgs.libvterm-neovim];
+  myBaseEmacs = pkgs.emacs-unstable;
   emacsWithPackages = (pkgs.emacsPackagesFor myBaseEmacs).emacsWithPackages;
-  myEmacs =
-    emacsWithPackages (epkgs: (with epkgs; [
-      ]));
+  myEmacs = emacsWithPackages (epkgs: (with epkgs; []));
 in {
   imports = [];
   options = {
@@ -41,48 +40,47 @@ in {
               }")
               pkgs.tree-sitter.builtGrammars)};
         '';
-        packages = with pkgs; [
-          myEmacs
-          # TODO: make this a separate derivation for libvterm, see https://weblog.zamazal.org/sw-problem-nixos-emacs-vterm/
-          cmake
-          libvterm-neovim
-          actionlint
-          black
-          bun
-          texliveFull # Needed for org pdf export
-          docker
-          fd
-          go
-          gofumpt
-          golangci-lint
-          golangci-lint-langserver
-          gopls
-          gotools
-          lua
-          just
-          nodejs_18
-          envsubst # TODO: move this to some separate place
-          awscli2
-          nodePackages_latest.pnpm
-          nodePackages_latest.typescript
-          nodePackages_latest.typescript-language-server
-          netcat
-          python3
-          python311Packages.packaging
-          python311Packages.python-lsp-server
-          ruff
-          python311Packages.ruff-lsp
-          (rust-bin.selectLatestNightlyWith (toolchain:
-            toolchain.default.override {
-              extensions = ["rust-src" "rust-analyzer"];
-            }))
-          ripgrep
-          bun
-          terraform-ls
-          yamllint
-          zig
-          zls
-        ];
+        packages =
+          (with pkgs; [
+            # TODO: make this a separate derivation for libvterm, see https://weblog.zamazal.org/sw-problem-nixos-emacs-vterm/
+            actionlint
+            black
+            bun
+            texliveFull # Needed for org pdf export
+            docker
+            fd
+            go
+            gofumpt
+            golangci-lint
+            golangci-lint-langserver
+            gopls
+            gotools
+            lua
+            just
+            nodejs_18
+            envsubst # TODO: move this to some separate place
+            awscli2
+            nodePackages_latest.pnpm
+            nodePackages_latest.typescript
+            nodePackages_latest.typescript-language-server
+            netcat
+            python3
+            python311Packages.packaging
+            python311Packages.python-lsp-server
+            ruff
+            ghostscript
+            python311Packages.ruff-lsp
+            (rust-bin.selectLatestNightlyWith (toolchain:
+              toolchain.default.override {
+                extensions = ["rust-src" "rust-analyzer"];
+              }))
+            ripgrep
+            bun
+            terraform-ls
+            yamllint
+          ])
+          ++ [myEmacs]
+          ++ vterm-deps;
       };
     };
   };

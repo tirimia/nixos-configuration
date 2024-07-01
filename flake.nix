@@ -1,5 +1,4 @@
 {
-  # TODO: figure out tests and checks
   description = "tirimia NixOS configs";
 
   inputs = {
@@ -7,6 +6,9 @@
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
 
     rust-overlay.url = "github:oxalica/rust-overlay";
 
@@ -34,7 +36,8 @@
     pkgsFor = system:
       import inputs.nixpkgs {
         overlays = [
-          (import inputs.rust-overlay)
+          inputs.emacs-overlay.overlays.default
+          inputs.rust-overlay.overlays.default
           (final: prev: {
             inherit (inputs.nix-linter.legacyPackages.${system}) nix-linter;
           })

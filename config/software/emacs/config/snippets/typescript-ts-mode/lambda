@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lambda
+# key: lambda
+# --
+${1:async} (${2:args}): ${3:return} => { $0 }
