@@ -211,6 +211,8 @@
   (global-evil-mc-mode)
   (global-unset-key (kbd "M-<down-mouse-1>"))
   (global-set-key (kbd "M-<mouse-1>") 'evil-mc-toggle-cursor-on-click))
+(use-package evil-multiedit
+  :config (evil-multiedit-default-keybinds))
 (use-package evil-escape
   :commands (evil-escape-mode)
   :custom
@@ -450,26 +452,7 @@ We only want buffers in the same major mode and visible buffers to be used."
     (vterm t)))
 
 ;;; Magit
-(use-package magit
-  :commands (magit-get-current-branch magit-refresh-buffer)
-  :config
-  (defun tirimia/smart-magit-refresh ()
-    "Refresh magit only if the buffer is visible."
-    (interactive)
-    (let* ((project-name (projectile-project-name))
-           (buffer-name (format "magit: %s" project-name)))
-      (when (get-buffer-window buffer-name t) (magit-refresh-buffer)))) ;; TODO: figure out why this is not running
-  (defun tirimia/set-commit-task-id ()
-    "Sets up the task ID in a commit message if the branch is appropriate."
-    (when-let* ((branch (magit-get-current-branch)) ;; TODO: more refined, maybe implement common commits
-                (task-id
-                 (save-match-data
-                   (and (string-match "^\\([[:upper:]]+-[[:digit:]]+\\)*" branch)
-                        (match-string 0 branch)))))
-      (unless (string-empty-p task-id) (insert (format "%s: " task-id)))))
-  :hook
-  (git-commit-setup . tirimia/set-commit-task-id)
-  (after-save . tirimia/smart-magit-refresh))
+(use-package magit)
 
 ;;;; Whodunnit
 (use-package blamer
@@ -516,19 +499,18 @@ We only want buffers in the same major mode and visible buffers to be used."
   (projectile-completion-system 'auto)
   (projectile-indexing-method 'alien)
   (projectile-enable-caching nil)
+  (projectile-ignored-project-function
+   (lambda (path) (cl-some
+              (lambda (prefix) (string-prefix-p prefix path))
+              '("/nix/store/" "~/.cargo/registry"))))
   :config
-  (defun tirimia/compile-in-project-root ()
-    "Run compile in project root for special use-cases."
-    (interactive)
-    (let ((default-directory (projectile-project-root))) (compile (compilation-read-command compile-command))))
-  ;; TODO: learn about current-prefix-arg
   (projectile-mode))
 (use-package consult
   :commands (consult--file-action)
   :after (projectile)
   :general ("M-g M-g" 'consult-goto-line)
   :custom
-  (consult-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --with-filename --line-number --search-zip --hidden --glob=!.git/")
+  (consult-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --with-filename --line-number --search-zip --hidden --glob=!.git/ --glob=!vendor/")
   (consult-project-function #'projectile-project-root)
   (consult-buffer-sources '(consult--source-buffer consult--source-projectile-projects consult--source-projectile-file))
   :config
@@ -554,6 +536,8 @@ We only want buffers in the same major mode and visible buffers to be used."
   :commands marginalia-mode
   :config (marginalia-mode))
 ;; TODO: dap mode and dap-mode-typescript etc.
+(use-package voyager
+  :straight (:host github :repo "manateelazycat/voyager" :files ("*")))
 (use-package lsp-mode
   :commands (lsp lsp-deferred lsp-format-buffer lsp-organize-imports lsp-completion-at-point)
   :custom
@@ -563,6 +547,7 @@ We only want buffers in the same major mode and visible buffers to be used."
   (lsp-modeline-diagnostics-enable nil)
   (lsp-diagnostics-provider :flycheck)
   (lsp-signature-render-documentation nil)
+  (lsp-inlay-hint-enable t)
   (lsp-disabled-clients '())
   (lsp-semgrep-languages '() "Disable this stupid lsp"))
 
@@ -570,6 +555,7 @@ We only want buffers in the same major mode and visible buffers to be used."
   :general
   (:states 'normal :keymaps 'lsp-mode-map
            "gd" '(lsp-ui-peek-find-definitions :which-key "Definitions")
+           "gr" '(lsp-ui-peek-find-references :which-key "References")
            "K" '(lsp-describe-thing-at-point :which-key "Describe"))
   :config
   (setq-default lsp-ui-sideline-enable nil)
@@ -644,7 +630,7 @@ DOCS will be provided via devdocs if installed."
   :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
   :major-modes t
   "m" '(:ignore t :which-key "Elisp Mode")
-  "mr" '(tirimia/compile-in-project-root :which-key "Compile in root")
+  "mr" '(project-compile :which-key "Compile in root")
   "mx" '(eval-defun :which-key "Eval top")
   "me" '(eval-last-sexp :which-key "Eval-last"))
 (add-hook 'emacs-lisp-mode-hook #'tirimia/elisp-setup)
@@ -684,12 +670,44 @@ DOCS will be provided via devdocs if installed."
                      (shadow . t)
                      (unusedwrite . t) (unusedparams . t) (unusedvariable . t) (useany . t) (fieldalignment . t)))
   :hook ((go-mode go-ts-mode) . tirimia/go-setup))
+(use-package elixir-ts-mode
+  :straight (:type built-in)
+  :init (with-eval-after-load 'lsp-mode
+          (lsp-register-client
+           (make-lsp-client :new-connection (lsp-stdio-connection '("nextls" "--stdio" ))
+                            :multi-root t
+                            :initialization-options '(:experimental (:completions (:enable t))) ;; Enable the experimental completion mode
+                            :activation-fn (lsp-activate-on "elixir")
+                            :server-id 'next-ls)))
+  (with-eval-after-load 'flycheck
+    (defun tirimia/find-mix-root () "Get the root of a mix project." (locate-dominating-file (buffer-file-name) "mix.exs"))
+    (flycheck-define-checker elixir-dialyzer
+      "Elixir syntax checker based on dialyzer."
+      :command ("mix" "dialyzer")
+      :default-directory #'tirimia/find-mix-root
+      :error-patterns
+      ((error line-start
+	      (file-name)
+	      ":"
+	      line
+	      ":"
+	      (message)
+	      line-end))
+      :modes elixir-ts-mode)
+    (add-to-list 'flycheck-checkers 'elixir-dialyzer t))
+  :config
+  (defun tirimia/elixir-setup ()
+    "Setup for juicy elixir"
+    (interactive)
+    (tirimia/prog-with-lsp '("elixir~1.17")))
+  :custom (lsp-elixir-local-server-command "elixir-ls")
+  :hook (elixir-ts-mode . tirimia/elixir-setup))
 (tirimia/key-definer
   :keymaps '(go-ts-mode-map go-mode-map)
   :major-modes t
   "m" '(:ignore t :which-key "Golang")
   "mc" '(compile :which-key "Go Compile")
-  "mr" '(tirimia/compile-in-project-root :which-key "Go Compile in root")
+  "mr" '(project-compile :which-key "Go Compile in root")
   "mm" '(recompile :which-key "Go Recompile")
   "mh" '(lsp-describe-thing-at-point :which-key "Help"))
 (use-package rustic
@@ -720,14 +738,6 @@ DOCS will be provided via devdocs if installed."
   "mf" '(rustic-cargo-clippy-fix :which-key "Rustic Fix") ;; TODO: this won't work with uncommitted changes
   "mh" '(lsp-describe-thing-at-point :which-key "Help") ;; TODO: for some reason this doesn`t work
   "mm" '(rustic-recompile :which-key "Rustic Recompile"))
-;; TODO: configure installing necessary tools and pacakge
-(use-package reformatter
-  :config
-  ;; TODO: find prettier, then biome, then worst case npx prettier
-  (reformatter-define prettier-format
-    :program "npx"
-    :args (list "prettier" "--stdin-filepath" (buffer-file-name))))
-;; TODO: in projects that contain prettierrc, turn on autosave and autorevert in each file
 (use-package typescript-ts-mode
   :straight (:type built-in)
   :custom
@@ -744,21 +754,15 @@ DOCS will be provided via devdocs if installed."
     "Setup for writing TS"
     (interactive)
     (setq-local devdocs-current-docs '("typescript" "node~18_lts"))
-    (add-hook 'before-save-hook #'lsp-organize-imports t t)
-    (prettier-format-on-save-mode)
     (lsp-deferred))
-  (defun tirimia/tsx-font-lock-fix ()
-    "TSX TS parser is taking waaay too much memory. Gonna make fontification not happen as often."
-    (setq-local jit-lock-defer-time 0.5))
   :mode (("\\.ts\\'" . typescript-ts-mode) ("\\.tsx\\'" . tsx-ts-mode))
-  :hook (((tsx-ts-mode typescript-ts-mode) . tirimia/typescript-setup)
-         (tsx-ts-mode . tirimia/tsx-font-lock-fix)))
+  :hook (((tsx-ts-mode typescript-ts-mode) . tirimia/typescript-setup)))
 (tirimia/key-definer
   :keymaps '(tsx-ts-mode-map typescript-ts-mode-map)
   :major-modes t
   "m" '(:ignore t :which-key "TypeScript")
   "mc" '(compile :which-key "TS Compile")
-  "mr" '(tirimia/compile-in-project-root :which-key "Compile in root")
+  "mr" '(project-compile :which-key "Compile in root")
   "mm" '(recompile :which-key "TS Recompile")
   "mh" '(lsp-describe-thing-at-point :which-key "Help"))
 (use-package prisma-mode
@@ -836,22 +840,22 @@ DOCS will be provided via devdocs if installed."
 (use-package know-your-http-well)
 ;; Nix
 ;; TODO: make it automatically add semicolons, abbrev or pair mode
-(use-package nix-mode
+(use-package nix-ts-mode
   :mode "\\.nix\\'"
   :config
   (defun tirimia/nix-setup ()
     "Setup for writing Nix."
     (interactive)
     (setq-local devdocs-current-docs '("nix"))
-    (flycheck-add-next-checker 'lsp 'nix t)
-    (lsp-deferred))
-  :hook (nix-mode . tirimia/nix-setup))
+    (lsp)
+    (flycheck-add-next-checker 'lsp 'nix t))
+  :hook (nix-ts-mode . tirimia/nix-setup))
 (tirimia/key-definer
-  :keymaps '(nix-mode-map)
+  :keymaps '(nix-ts-mode-map)
   :major-modes t
   "m" '(:ignore t :which-key "Nix")
   ;; TODO: add a format binding
-  "mr" '(tirimia/compile-in-project-root :which-key "Compile in root")
+  "mr" '(project-compile :which-key "Compile in root")
   "mm" '(recompile :which-key "Recompile")
   "mh" '(lsp-describe-thing-at-point :which-key "Help"))
 (add-to-list 'exec-path "/Users/tirimia/.nix-profile/bin")
@@ -861,7 +865,7 @@ DOCS will be provided via devdocs if installed."
 (defvar lsp-nix-nixd-server-path "nixd" "temp var for nixd.")
 (lsp-register-client
  (make-lsp-client :new-connection (lsp-stdio-connection (lambda () lsp-nix-nixd-server-path))
-                  :major-modes '(nix-mode)
+                  :major-modes '(nix-mode nix-ts-mode)
                   :initialized-fn (lambda (workspace)
                                     (with-lsp-workspace workspace
                                       (lsp--set-configuration
@@ -880,7 +884,7 @@ DOCS will be provided via devdocs if installed."
   :major-modes t
   "m" '(:ignore t :which-key "Haskell")
   "mc" '(compile :which-key "Compile")
-  "mr" '(tirimia/compile-in-project-root :which-key "Compile in root")
+  "mr" '(project-compile :which-key "Compile in root")
   "mm" '(recompile :which-key "Recompile")
   "mh" '(lsp-describe-thing-at-point :which-key "Help"))
 (use-package treesit
@@ -1217,7 +1221,7 @@ file compatible with the kafka partition reassignment tool."
                         (org-agenda-prefix-format "%c : %b %s")
                         (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled)) ;; Only show TODOs without scheduled or deadline timestamps
                         )))))
-      org-agenda-files '("~/MEGA/Org/Agenda.org" "~/MEGA/Org/Daily")
+      org-agenda-files '("~/MEGA/Org/Agenda.org")
       org-agenda-span 14
       org-agenda-start-with-log-mode t
       org-log-done 'time

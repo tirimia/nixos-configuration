@@ -4,10 +4,20 @@
   pkgs,
   ...
 }: let
-  vterm-deps = [pkgs.cmake pkgs.libvterm-neovim];
-  myBaseEmacs = pkgs.emacs-unstable;
+  #vterm-deps = [pkgs.libtool pkgs.cmake pkgs.libvterm-neovim];
+  myBaseEmacs = pkgs.emacs-git;
   emacsWithPackages = (pkgs.emacsPackagesFor myBaseEmacs).emacsWithPackages;
   myEmacs = emacsWithPackages (epkgs: (with epkgs; []));
+  # TODO: get https://github.com/manateelazycat/holo-layer integrated once pyobjc is in nixpkgs
+  myPython = pkgs.python3.withPackages (ppkgs:
+    with ppkgs; [
+      epc
+      sexpdata
+      six
+      packaging
+      python-lsp-server
+      ruff-lsp
+    ]);
 in {
   imports = [];
   options = {
@@ -49,6 +59,8 @@ in {
             texliveFull # Needed for org pdf export
             docker
             fd
+            elixir
+            next-ls # Elixir lsp
             go
             gofumpt
             golangci-lint
@@ -64,12 +76,8 @@ in {
             nodePackages_latest.typescript
             nodePackages_latest.typescript-language-server
             netcat
-            python3
-            python311Packages.packaging
-            python311Packages.python-lsp-server
             ruff
             ghostscript
-            python311Packages.ruff-lsp
             (rust-bin.selectLatestNightlyWith (toolchain:
               toolchain.default.override {
                 extensions = ["rust-src" "rust-analyzer"];
@@ -79,8 +87,9 @@ in {
             terraform-ls
             yamllint
           ])
-          ++ [myEmacs]
-          ++ vterm-deps;
+          ++ [myEmacs myPython]
+          #++ vterm-deps
+          ;
       };
     };
   };

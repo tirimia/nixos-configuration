@@ -46,7 +46,7 @@
         config.allowUnfree = true;
       };
     flakeNixPathModule = args: {
-      config.nix.nixPath = ["nixpkgs=${inputs.nixpkgs.outPath}"];
+      nix.settings.extra-nix-path = "nixpkgs=${inputs.nixpkgs.outPath}";
     };
   in {
     formatter = inputs.nixpkgs.lib.attrsets.genAttrs systems (

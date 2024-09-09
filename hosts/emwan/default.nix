@@ -13,20 +13,17 @@
   ];
   target.user = user;
   services.nix-daemon.enable = true;
-  nix.settings.experimental-features = "nix-command flakes";
+  nix.settings = {
+    experimental-features = ["nix-command" "flakes"];
+    trusted-users = [user];
+  };
 
   programs.zsh.enable = true;
   system.defaults = {
     dock.autohide = true;
   };
 
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-  };
-
-  fonts.fontDir.enable = true;
-  fonts.fonts = import ../../config/fonts.nix {inherit pkgs;};
+  fonts.packages = import ../../config/fonts.nix {inherit pkgs;};
 
   security.pam.enableSudoTouchIdAuth = true;
 
@@ -35,6 +32,11 @@
     useUserPackages = true;
     useGlobalPkgs = true;
     users.${user} = {
+      programs.direnv = {
+        enable = true;
+        nix-direnv.enable = true;
+      };
+
       home = {
         packages = [pkgs.jq];
         stateVersion = "24.05";
