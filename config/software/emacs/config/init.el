@@ -572,12 +572,8 @@ We only want buffers in the same major mode and visible buffers to be used."
 (use-package smartparens
   :commands (smartparens-global-mode sp-local-pair)
   :config
-  (smartparens-global-mode)
-  ;; Single quotes are necessary for quoting in emacs and lifetimes in rust
-  (sp-local-pair '(emacs-lisp-mode rust-mode rustic-mode) "'" nil :actions nil)
-  (sp-local-pair '(emacs-lisp-mode) "`" nil :actions nil)
-  ;; Web automatically adds them
-  (sp-local-pair '(web-mode) "{" nil :actions nil))
+  (require 'smartparens-config)
+  (smartparens-global-mode))
 
 ;; TODO: get this sorted
 (use-package web-mode
@@ -1387,7 +1383,7 @@ added :around, it goes to capture the respective daily note"
   "c" '(kill-buffer-and-window :which-key "Close")
   "f" '(find-file :which-key "Find file")
   "g" '(magit-status :which-key "Magit")
-  "h" '(describe-symbol :which-key "Help")
+  "h" '(helpful-symbol :which-key "Help")
   "k" '(kill-current-buffer :which-key "Kill")
 
   ;; Inserts
