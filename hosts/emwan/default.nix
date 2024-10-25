@@ -13,11 +13,11 @@
   ];
   target.user = user;
   services.nix-daemon.enable = true;
+  nix.channel.enable = false;
   nix.settings = {
     experimental-features = ["nix-command" "flakes"];
     trusted-users = [user];
   };
-
   programs.zsh.enable = true;
   system.defaults = {
     dock.autohide = true;

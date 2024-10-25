@@ -52,6 +52,9 @@
         }
       ];
     };
-    home.file."work/.gitconfig".text = '''';
+    home.file."work/.gitconfig".text = ''
+      [url "ssh://git@github.com/"]
+          insteadOf = https://github.com/
+    '';
   };
 }

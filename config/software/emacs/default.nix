@@ -59,8 +59,9 @@ in {
             texliveFull # Needed for org pdf export
             docker
             fd
-            elixir
-            next-ls # Elixir lsp
+            gleam
+            erlang_27
+            rebar3
             go
             gofumpt
             golangci-lint

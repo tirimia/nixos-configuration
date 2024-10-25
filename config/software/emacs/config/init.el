@@ -620,8 +620,7 @@ DOCS will be provided via devdocs if installed."
   (interactive)
   (setq-local comment-start ";; ")
   (with-eval-after-load 'outline (outline-minor-mode))
-  (with-eval-after-load 'devdocs (setq-local devdocs-current-docs '("elisp")))
-  (prettify-symbols-mode))
+  (with-eval-after-load 'devdocs (setq-local devdocs-current-docs '("elisp"))))
 (tirimia/key-definer
   :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
   :major-modes t
@@ -666,38 +665,6 @@ DOCS will be provided via devdocs if installed."
                      (shadow . t)
                      (unusedwrite . t) (unusedparams . t) (unusedvariable . t) (useany . t) (fieldalignment . t)))
   :hook ((go-mode go-ts-mode) . tirimia/go-setup))
-(use-package elixir-ts-mode
-  :straight (:type built-in)
-  :init (with-eval-after-load 'lsp-mode
-          (lsp-register-client
-           (make-lsp-client :new-connection (lsp-stdio-connection '("nextls" "--stdio" ))
-                            :multi-root t
-                            :initialization-options '(:experimental (:completions (:enable t))) ;; Enable the experimental completion mode
-                            :activation-fn (lsp-activate-on "elixir")
-                            :server-id 'next-ls)))
-  (with-eval-after-load 'flycheck
-    (defun tirimia/find-mix-root () "Get the root of a mix project." (locate-dominating-file (buffer-file-name) "mix.exs"))
-    (flycheck-define-checker elixir-dialyzer
-      "Elixir syntax checker based on dialyzer."
-      :command ("mix" "dialyzer")
-      :default-directory #'tirimia/find-mix-root
-      :error-patterns
-      ((error line-start
-	      (file-name)
-	      ":"
-	      line
-	      ":"
-	      (message)
-	      line-end))
-      :modes elixir-ts-mode)
-    (add-to-list 'flycheck-checkers 'elixir-dialyzer t))
-  :config
-  (defun tirimia/elixir-setup ()
-    "Setup for juicy elixir"
-    (interactive)
-    (tirimia/prog-with-lsp '("elixir~1.17")))
-  :custom (lsp-elixir-local-server-command "elixir-ls")
-  :hook (elixir-ts-mode . tirimia/elixir-setup))
 (tirimia/key-definer
   :keymaps '(go-ts-mode-map go-mode-map)
   :major-modes t
@@ -706,6 +673,33 @@ DOCS will be provided via devdocs if installed."
   "mr" '(project-compile :which-key "Go Compile in root")
   "mm" '(recompile :which-key "Go Recompile")
   "mh" '(lsp-describe-thing-at-point :which-key "Help"))
+;; Gleam
+(use-package gleam-ts-mode
+  :mode (rx ".gleam" eos)
+  :after lsp-mode
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '("gleam" "lsp"))
+    :major-modes '(gleam-mode gleam-ts-mode)
+    :priority -1
+    :server-id 'gleam-lsp))
+  (add-to-list 'lsp-language-id-configuration '(gleam-ts-mode . "gleam"))
+  (defun tirimia/gleam-setup ()
+    "Shine on you crazy diamond."
+    (interactive)
+    (add-hook 'before-save-hook #'lsp-format-buffer t t)
+    (lsp-deferred))
+  :hook (gleam-ts-mode . tirimia/gleam-setup))
+(tirimia/key-definer
+  :keymaps '(gleam-ts-mode)
+  :major-modes t
+  "m" '(:ignore t :which-key "Gleam")
+  "mc" '(compile :which-key "Compile")
+  "mr" '(project-compile :which-key "Compile in root")
+  "mm" '(recompile :which-key "Recompile")
+  "mh" '(lsp-describe-thing-at-point :which-key "Help"))
+
 (use-package rustic
   :straight (:host github :repo "brotzeit/rustic")
   :config
@@ -761,6 +755,18 @@ DOCS will be provided via devdocs if installed."
   "mr" '(project-compile :which-key "Compile in root")
   "mm" '(recompile :which-key "TS Recompile")
   "mh" '(lsp-describe-thing-at-point :which-key "Help"))
+(use-package lsp-biome
+  :straight (:host github :repo "cxa/lsp-biome" :files ("lsp-biome.el"))
+  :config
+  (setq lsp-biome-organize-imports-on-save t)
+  (setq lsp-biome-autofix-on-save t)
+  (setq lsp-biome-format-on-save t)
+  (setq lsp-biome-active-file-types (list (rx "." (or "tsx" "jsx"
+                                                      "ts" "js"
+                                                      "mts" "mjs"
+                                                      "cts" "cjs"
+                                                      "json" "jsonc")
+                                              eos))))
 (use-package prisma-mode
   :straight (emacs-prisma-mode :host github :repo "pimeys/emacs-prisma-mode" :branch "main")
   :config (add-hook 'prisma-mode-hook #'lsp))
@@ -918,12 +924,36 @@ DOCS will be provided via devdocs if installed."
 (use-package rainbow-delimiters
   :hook prog-mode)
 ;; TODO: virtualenv for python
+(use-package ligature
+  :config
+  ;; Enable the "www" ligature in every possible major mode
+  (ligature-set-ligatures 't '("www"))
+  ;; Enable traditional ligature support in eww-mode, if the
+  ;; `variable-pitch' face supports it
+  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+  ;; Enable all Cascadia Code ligatures in programming modes
+  (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                       ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                       "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                       "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                       "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                       "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                       "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                       "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                       ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                       "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                       "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                       "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                       "\\\\" "://"))
+  ;; Enables ligature checks globally in all buffers. You can also do it
+  ;; per mode with `ligature-mode'.
+  (global-ligature-mode t))
 (use-package python
-  :config (defun tirimia/python-setup ()
-            "Setup for writing Python."
-            (interactive)
-            (tirimia/prog-with-lsp '("python"))
-            (prettify-symbols-mode))
+  :config
+  (defun tirimia/python-setup ()
+    "Setup for writing Python."
+    (interactive)
+    (tirimia/prog-with-lsp '("python")))
   (tirimia/key-definer
     :keymap 'python-ts-mode-map
     :major-modes t

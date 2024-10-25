@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/0.1";
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -12,7 +13,6 @@
 
     rust-overlay.url = "github:oxalica/rust-overlay";
 
-    nixos-hardware.url = "github:nixos/nixos-hardware"; # Look into getting the fingerprint reader for thinkpads from here
     darwin.url = "github:lnl7/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -45,9 +45,6 @@
         inherit system;
         config.allowUnfree = true;
       };
-    flakeNixPathModule = args: {
-      nix.settings.extra-nix-path = "nixpkgs=${inputs.nixpkgs.outPath}";
-    };
   in {
     formatter = inputs.nixpkgs.lib.attrsets.genAttrs systems (
       system: (import inputs.nixpkgs {inherit system;}).alejandra
@@ -60,7 +57,6 @@
           inherit (config) system;
           modules = [
             inputs.home-manager.nixosModules.default
-            flakeNixPathModule
             ./hosts/${host}
             ./users/${username}
           ];
@@ -76,8 +72,9 @@
             {
               _module.args.user = username;
             }
+            (_: {system.stateVersion = 5;})
+            inputs.determinate.darwinModules.default
             inputs.home-manager.darwinModules.default
-            flakeNixPathModule
             ./hosts/${config.alias}
           ];
         })
