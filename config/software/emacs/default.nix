@@ -98,6 +98,9 @@ in {
               }))
             ripgrep
             bun
+            tectonic
+            texlab
+            watchexec
             terraform-ls
             yamllint
           ])
