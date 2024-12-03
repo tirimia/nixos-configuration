@@ -18,6 +18,21 @@
       python-lsp-server
       ruff-lsp
     ]);
+  libExtension =
+    if pkgs.system == "aarch64-darwin"
+    then "dylib"
+    else "so";
+  astro-treesit = pkgs.tree-sitter.buildGrammar {
+    language = "astro";
+    src = pkgs.fetchFromGitHub {
+      owner = "virchau13";
+      repo = "tree-sitter-astro";
+      rev = "4be180759ec13651f72bacee65fa477c64222a1a";
+      hash = "sha256-h1QtkJWQm+hgDqEsmnjKyDmNhgTyTkrIAFVg4gUBGXk=";
+      leaveDotGit = true;
+    };
+    version = "latest";
+  };
 in {
   imports = [];
   options = {
@@ -43,17 +58,15 @@ in {
           mkdir -p $out
           ${lib.concatStringsSep "\n"
             (lib.mapAttrsToList
-              (name: src: "name=${name}; ln -s ${src}/parser $out/\lib${name}${
-                if pkgs.system == "aarch64-darwin"
-                then ".dylib"
-                else ".so"
-              }")
+              (name: src: "name=${name}; ln -s ${src}/parser $out/\lib${name}.${libExtension}")
               pkgs.tree-sitter.builtGrammars)};
+          ln -s ${astro-treesit}/parser $out/libtree-sitter-astro.${libExtension}
         '';
         packages =
           (with pkgs; [
             # TODO: make this a separate derivation for libvterm, see https://weblog.zamazal.org/sw-problem-nixos-emacs-vterm/
             actionlint
+            astro-language-server
             black
             bun
             texliveFull # Needed for org pdf export

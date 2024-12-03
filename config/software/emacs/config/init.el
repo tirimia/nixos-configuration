@@ -536,8 +536,6 @@ We only want buffers in the same major mode and visible buffers to be used."
   :commands marginalia-mode
   :config (marginalia-mode))
 ;; TODO: dap mode and dap-mode-typescript etc.
-(use-package voyager
-  :straight (:host github :repo "manateelazycat/voyager" :files ("*")))
 (use-package lsp-mode
   :commands (lsp lsp-deferred lsp-format-buffer lsp-organize-imports lsp-completion-at-point)
   :custom
@@ -767,6 +765,15 @@ DOCS will be provided via devdocs if installed."
                                                       "cts" "cjs"
                                                       "json" "jsonc")
                                               eos))))
+(use-package astro-ts-mode
+  :config (setq-default astro-ts-grammar-repo "https://github.com/virchau13/tree-sitter-astro")
+  (defun tirimia/astro-mode ()
+    "Setup for astro"
+    (interactive)
+    (setq-local lsp-inlay-hint-enable nil
+                lsp-modeline-code-actions-enable nil) ;; Freaks astro out to keep these enabled
+    (lsp))
+  :hook (astro-ts-mode . tirimia/astro-mode))
 (use-package prisma-mode
   :straight (emacs-prisma-mode :host github :repo "pimeys/emacs-prisma-mode" :branch "main")
   :config (add-hook 'prisma-mode-hook #'lsp))
@@ -783,6 +790,18 @@ DOCS will be provided via devdocs if installed."
   :ensure nil
   :mode ("\\.cjs\\'" "\\.mjs\\'" "\\.js\\'" )
   :hook (js-ts-mode . lsp-deferred))
+(use-package lsp-latex
+  :hook ((TeX-mode bibtex-mode) . lsp-deferred)
+  :commands (lsp-latex-build)
+  :config
+  (setq lsp-latex-build-executable "tectonic")
+  (setq lsp-latex-build-args '( "%f"
+                                "--synctex"
+                                "--keep-logs"
+                                "--keep-intermediates"))
+  (setq lsp-latex-forward-search-executable "emacsclient")
+  (setq lsp-latex-forward-search-args
+        '("--eval" "(lsp-latex-forward-search-with-pdf-tools \"%f\" \"%p\" \"%l\")")))
 
 (use-package php-mode) ;; Because one must
 
@@ -879,7 +898,7 @@ DOCS will be provided via devdocs if installed."
   (defun tirimia/haskell-setup ()
     "Setup for Haskell."
     (interactive)
-    (tirimia/prog-with-lsp "haskell~9"))
+    (tirimia/prog-with-lsp '("haskell~9")))
   :hook (haskell-mode . tirimia/haskell-setup))
 (tirimia/key-definer
   :keymaps '(haskell-mode-map)
