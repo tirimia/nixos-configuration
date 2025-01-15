@@ -7,6 +7,9 @@
   options = {
   };
   config = {
+    programs.zsh.promptInit = '''';
+    programs.zsh.enableGlobalCompInit = false;
+    programs.zsh.enableBashCompletion = false;
     home-manager.users.${config.target.user} = {
       programs.zsh = {
         enable = true;
@@ -130,7 +133,7 @@
         enableZshIntegration = true;
       };
       home = {
-        packages = with pkgs; [zsh-powerlevel10k direnv];
+        packages = with pkgs; [zsh-powerlevel10k];
         file.".config/zsh/powerlevel10k.zsh".source = ./powerlevel10k.zsh;
       };
     };

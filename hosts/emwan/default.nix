@@ -15,6 +15,7 @@
   services.nix-daemon.enable = true;
   nix.channel.enable = false;
   nix.settings = {
+    build-dir = "/Users/nixbld/workspace";
     experimental-features = ["nix-command" "flakes"];
     trusted-users = [user];
   };

@@ -4,7 +4,7 @@
   pkgs,
   ...
 }: let
-  #vterm-deps = [pkgs.libtool pkgs.cmake pkgs.libvterm-neovim];
+  vterm-deps = [pkgs.glibtool pkgs.cmake pkgs.libvterm-neovim];
   myBaseEmacs = pkgs.emacs-git;
   emacsWithPackages = (pkgs.emacsPackagesFor myBaseEmacs).emacsWithPackages;
   myEmacs = emacsWithPackages (epkgs: (with epkgs; []));
@@ -15,7 +15,6 @@
       sexpdata
       six
       packaging
-      python-lsp-server
       ruff-lsp
     ]);
   libExtension =
@@ -42,9 +41,11 @@ in {
     };
   };
   config = {
+    environment.systemPackages = [myEmacs];
     services.emacs = {
       enable = true;
       package = myEmacs;
+      additionalPath = ["/etc/profiles/per-user/${config.target.user}/bin"];
     };
 
     home-manager.users.${config.target.user} = {
@@ -68,6 +69,7 @@ in {
             actionlint
             astro-language-server
             black
+            basedpyright
             bun
             texliveFull # Needed for org pdf export
             docker
@@ -75,6 +77,8 @@ in {
             gleam
             erlang_27
             rebar3
+            elixir
+            elixir-ls
             go
             gofumpt
             golangci-lint
@@ -100,13 +104,13 @@ in {
             bun
             tectonic
             texlab
+            uv
             watchexec
             terraform-ls
             yamllint
           ])
-          ++ [myEmacs myPython]
-          #++ vterm-deps
-          ;
+          ++ [myPython]
+          ++ vterm-deps;
       };
     };
   };

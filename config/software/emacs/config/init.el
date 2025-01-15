@@ -50,10 +50,20 @@
         package-native-compile t))
 (use-package exec-path-from-shell
   :commands exec-path-from-shell-initialize
+  :custom
+  (exec-path-from-shell-variables
+   '("PATH"
+     "SHELL"
+     "NIX_PATH"
+     "NIX_PROFILES"
+     "NIX_REMOTE"
+     "NIX_SSL_CERT_FILE"
+     "NIX_USER_PROFILE_DIR"
+     "JAVA_HOME"
+     ))
   :config
   (when (or (memq window-system '(mac ns x)) (daemonp))
     (exec-path-from-shell-initialize)))
-(use-package use-package-ensure-system-package)
 
 (use-package org)
 
@@ -250,6 +260,14 @@
 (use-package evil-collection
   :commands (evil-collection-init)
   :config (evil-collection-init '(calc org magit vterm)))
+(use-package evil-textobj-tree-sitter
+  :config
+  (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
+  (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
+  (define-key evil-outer-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.outer"))
+  (define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.inner"))
+
+  )
 
 ;; TODO: consider using the default mode line but modded
 (use-package mood-line
@@ -355,6 +373,7 @@ We only want buffers in the same major mode and visible buffers to be used."
   (latex-mode . setup-tex-completion))
 
 ;;; Linting
+;; TODO: Make the cursor the color of the highest error
 (use-package flycheck
   :after general
   :commands (global-flycheck-mode)
@@ -550,12 +569,11 @@ We only want buffers in the same major mode and visible buffers to be used."
   (lsp-semgrep-languages '() "Disable this stupid lsp"))
 
 (use-package lsp-ui
-  :general
-  (:states 'normal :keymaps 'lsp-mode-map
-           "gd" '(lsp-ui-peek-find-definitions :which-key "Definitions")
-           "gr" '(lsp-ui-peek-find-references :which-key "References")
-           "K" '(lsp-describe-thing-at-point :which-key "Describe"))
   :config
+  (evil-define-key 'normal lsp-mode-map
+    "gd" #'lsp-ui-peek-find-definitions
+    "gr" #'lsp-ui-peek-find-references
+    "K" #'lsp-describe-thing-at-point)
   (setq-default lsp-ui-sideline-enable nil)
   (setq-default lsp-ui-sideline-show-diagnostics nil)
   (setq-default lsp-ui-doc-show-with-cursor nil)
@@ -671,6 +689,30 @@ DOCS will be provided via devdocs if installed."
   "mr" '(project-compile :which-key "Go Compile in root")
   "mm" '(recompile :which-key "Go Recompile")
   "mh" '(lsp-describe-thing-at-point :which-key "Help"))
+;; Elixir
+(use-package flycheck-credo
+  ;; {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+  :defines (flycheck-credo-setup)
+  :after (flycheck elixir-ts-mode)
+  :config (flycheck-credo-setup))
+(use-package elixir-ts-mode
+  :straight (:type built-in)
+  :mode "\\.ex[s]?\\'"
+  :config
+  (defun tirimia/elixir-setup ()
+    "Setup for OTP goodness"
+    (interactive)
+    (tirimia/prog-with-lsp '("elixir~1.17")))
+  (setq lsp-elixir-server-command '("elixir-ls"))
+  :hook (elixir-ts-mode . tirimia/elixir-setup))
+(tirimia/key-definer
+  :keymaps 'elixir-ts-mode-map
+  :major-modes t
+  "m" '(:ignore t :which-key "Elixir")
+  "mc" '(compile :which-key "Compile")
+  "mr" '(projectile-compile-project :which-key "Compile in root")
+  "mm" '(recompile :which-key "Recompile")
+  "mh" '(lsp-describe-thing-at-point :which-key "Help"))
 ;; Gleam
 (use-package gleam-ts-mode
   :mode (rx ".gleam" eos)
@@ -690,11 +732,11 @@ DOCS will be provided via devdocs if installed."
     (lsp-deferred))
   :hook (gleam-ts-mode . tirimia/gleam-setup))
 (tirimia/key-definer
-  :keymaps '(gleam-ts-mode)
+  :keymaps 'gleam-ts-mode-map
   :major-modes t
   "m" '(:ignore t :which-key "Gleam")
   "mc" '(compile :which-key "Compile")
-  "mr" '(project-compile :which-key "Compile in root")
+  "mr" '(projectile-compile-project :which-key "Compile in root")
   "mm" '(recompile :which-key "Recompile")
   "mh" '(lsp-describe-thing-at-point :which-key "Help"))
 
@@ -969,17 +1011,19 @@ DOCS will be provided via devdocs if installed."
   (global-ligature-mode t))
 (use-package python
   :config
-  (defun tirimia/python-setup ()
-    "Setup for writing Python."
-    (interactive)
-    (tirimia/prog-with-lsp '("python")))
   (tirimia/key-definer
     :keymap 'python-ts-mode-map
     :major-modes t
     "m" '(:ignore t :which-key "Python Mode")
     "mc" '(compile :which-key "Python Compile")
-    "mm" '(recompile :which-key "Python Recompile"))
-  :hook (python-ts-mode . tirimia/python-setup))
+    "mm" '(recompile :which-key "Python Recompile")
+    "mr" '(projectile-compile-project :which-key "Compile in root")))
+(use-package lsp-pyright
+  :custom (lsp-pyright-langserver-command "basedpyright")
+  :hook (python-ts-mode . (lambda ()
+                            ;; Pyright won't be detected normally if not in the same function, sounds stupid but this is what I observed
+                            (require 'lsp-pyright)
+                            (tirimia/prog-with-lsp '("python")))))
 (use-package lua-mode)
 (use-package kotlin-mode)
 (use-package toml-mode)
