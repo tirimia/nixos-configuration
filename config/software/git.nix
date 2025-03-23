@@ -3,9 +3,10 @@
   lib,
   config,
   ...
-}: {
-  imports = [];
-  options = {};
+}:
+{
+  imports = [ ];
+  options = { };
   config.home-manager.users.${config.target.user} = {
     programs.git = {
       enable = true;

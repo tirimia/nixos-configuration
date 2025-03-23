@@ -1,5 +1,8 @@
-{pkgs ? import <nixpkgs> {}}:
-with pkgs; [
+{
+  pkgs ? import <nixpkgs> { },
+}:
+with pkgs;
+[
   iosevka-comfy.comfy-wide
   intel-one-mono
   fira-code

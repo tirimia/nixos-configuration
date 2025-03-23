@@ -3,37 +3,30 @@
   lib,
   pkgs,
   ...
-}: let
-  vterm-deps = [pkgs.glibtool pkgs.cmake pkgs.libvterm-neovim];
-  myBaseEmacs = pkgs.emacs-git;
+}:
+let
+  vterm-deps = [
+    pkgs.glibtool
+    pkgs.cmake
+    pkgs.libvterm-neovim
+  ];
+  myBaseEmacs = pkgs.emacs;
   emacsWithPackages = (pkgs.emacsPackagesFor myBaseEmacs).emacsWithPackages;
-  myEmacs = emacsWithPackages (epkgs: (with epkgs; []));
+  myEmacs = emacsWithPackages (epkgs: (with epkgs; [ ]));
   # TODO: get https://github.com/manateelazycat/holo-layer integrated once pyobjc is in nixpkgs
-  myPython = pkgs.python3.withPackages (ppkgs:
-    with ppkgs; [
+  myPython = pkgs.python3.withPackages (
+    ppkgs: with ppkgs; [
       epc
       sexpdata
       six
       packaging
       ruff-lsp
-    ]);
-  libExtension =
-    if pkgs.system == "aarch64-darwin"
-    then "dylib"
-    else "so";
-  astro-treesit = pkgs.tree-sitter.buildGrammar {
-    language = "astro";
-    src = pkgs.fetchFromGitHub {
-      owner = "virchau13";
-      repo = "tree-sitter-astro";
-      rev = "4be180759ec13651f72bacee65fa477c64222a1a";
-      hash = "sha256-h1QtkJWQm+hgDqEsmnjKyDmNhgTyTkrIAFVg4gUBGXk=";
-      leaveDotGit = true;
-    };
-    version = "latest";
-  };
-in {
-  imports = [];
+    ]
+  );
+  libExtension = if pkgs.system == "aarch64-darwin" then "dylib" else "so";
+in
+{
+  imports = [ ];
   options = {
     target.user = lib.mkOption {
       type = lib.types.str;
@@ -41,11 +34,11 @@ in {
     };
   };
   config = {
-    environment.systemPackages = [myEmacs];
+    environment.systemPackages = [ myEmacs ];
     services.emacs = {
       enable = true;
       package = myEmacs;
-      additionalPath = ["/etc/profiles/per-user/${config.target.user}/bin"];
+      additionalPath = [ "/etc/profiles/per-user/${config.target.user}/bin" ];
     };
 
     home-manager.users.${config.target.user} = {
@@ -55,13 +48,15 @@ in {
           recursive = true;
         };
         # TODO: try to get the libraries to compile straight into emacs
-        file.".config/emacs/tree-sitter".source = pkgs.runCommand "grammars" {} ''
+        file.".config/emacs/tree-sitter".source = pkgs.runCommand "grammars" { } ''
           mkdir -p $out
-          ${lib.concatStringsSep "\n"
-            (lib.mapAttrsToList
-              (name: src: "name=${name}; ln -s ${src}/parser $out/\lib${name}.${libExtension}")
-              pkgs.tree-sitter.builtGrammars)};
-          ln -s ${astro-treesit}/parser $out/libtree-sitter-astro.${libExtension}
+          ${
+            lib.concatStringsSep "\n" (
+              lib.mapAttrsToList (
+                name: src: "name=${name}; ln -s ${src}/parser $out/\lib${name}.${libExtension}"
+              ) pkgs.tree-sitter.builtGrammars
+            )
+          };
         '';
         packages =
           (with pkgs; [
@@ -96,10 +91,15 @@ in {
             netcat
             ruff
             ghostscript
-            (rust-bin.selectLatestNightlyWith (toolchain:
+            (rust-bin.selectLatestNightlyWith (
+              toolchain:
               toolchain.default.override {
-                extensions = ["rust-src" "rust-analyzer"];
-              }))
+                extensions = [
+                  "rust-src"
+                  "rust-analyzer"
+                ];
+              }
+            ))
             ripgrep
             bun
             tectonic
@@ -109,7 +109,7 @@ in {
             terraform-ls
             yamllint
           ])
-          ++ [myPython]
+          ++ [ myPython ]
           ++ vterm-deps;
       };
     };

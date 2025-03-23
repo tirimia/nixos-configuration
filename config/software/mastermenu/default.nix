@@ -3,7 +3,8 @@
   lib,
   config,
   ...
-}: {
+}:
+{
   config = {
     home-manager.users.${config.target.user} = {
       home = {

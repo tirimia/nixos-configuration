@@ -5,7 +5,8 @@
   inputs,
   home-manager,
   ...
-}: {
+}:
+{
   imports = [
     ./hardware-configuration.nix
     ../../config/base.nix
@@ -53,7 +54,7 @@
       lightdm.enable = true;
     };
     # TODO: replace with a real window manager
-    videoDrivers = ["intel"];
+    videoDrivers = [ "intel" ];
     deviceSection = ''
       Option "DRI" "2"
       Option "TearFree" "true"
@@ -76,7 +77,7 @@
     settings.PasswordAuthentication = true;
   };
 
-  fonts.packages = import ../../config/fonts.nix {inherit pkgs;};
+  fonts.packages = import ../../config/fonts.nix { inherit pkgs; };
 
   virtualisation.docker.enable = true;
 

@@ -2,8 +2,9 @@
   pkgs,
   config,
   ...
-}: {
-  imports = [];
+}:
+{
+  imports = [ ];
   options = {
   };
   config = {
@@ -133,7 +134,7 @@
         enableZshIntegration = true;
       };
       home = {
-        packages = with pkgs; [zsh-powerlevel10k];
+        packages = with pkgs; [ zsh-powerlevel10k ];
         file.".config/zsh/powerlevel10k.zsh".source = ./powerlevel10k.zsh;
       };
     };

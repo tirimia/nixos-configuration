@@ -3,9 +3,10 @@
   lib,
   config,
   ...
-}: {
-  imports = [];
-  options = {};
+}:
+{
+  imports = [ ];
+  options = { };
   config = {
     nix.settings.substituters = [
       "https://nix-community.cachix.org"

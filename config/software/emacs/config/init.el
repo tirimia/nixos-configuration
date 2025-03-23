@@ -502,6 +502,8 @@ We only want buffers in the same major mode and visible buffers to be used."
   (completion-ignore-case t)
   (completion-styles '(flex))
   :config (vertico-mode))
+(use-package vertico-posframe
+  :config (vertico-posframe-mode))
 
 ;; TODO: NEWMACS add fussy if necessary
 
@@ -520,8 +522,8 @@ We only want buffers in the same major mode and visible buffers to be used."
   (projectile-enable-caching nil)
   (projectile-ignored-project-function
    (lambda (path) (cl-some
-              (lambda (prefix) (string-prefix-p prefix path))
-              '("/nix/store/" "~/.cargo/registry"))))
+                   (lambda (prefix) (string-prefix-p prefix path))
+                   '("/nix/store/" "~/.cargo/registry"))))
   :config
   (projectile-mode))
 (use-package consult
