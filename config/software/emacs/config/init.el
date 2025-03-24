@@ -472,6 +472,8 @@ We only want buffers in the same major mode and visible buffers to be used."
 
 ;;; Magit
 (use-package magit)
+(use-package transient-posframe
+  :config (transient-posframe-mode))
 
 ;;;; Whodunnit
 (use-package blamer
