@@ -73,7 +73,7 @@
               vterm_printf "51;E$vterm_elisp"
           }
           ff() {
-              vterm_cmd find-file "$(realpath "''${@:-.}")"
+              vterm_cmd find-file "''${@:A}"
           }
           nix-sha() {
               nix hash to-sri --type sha256 $(nix-prefetch-url $1)
