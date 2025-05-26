@@ -67,6 +67,7 @@ in
             basedpyright
             bun
             texliveFull # Needed for org pdf export
+            devenv
             docker
             fd
             gleam
@@ -74,6 +75,7 @@ in
             rebar3
             elixir
             elixir-ls
+            gh
             go
             gofumpt
             golangci-lint
@@ -82,7 +84,10 @@ in
             gotools
             lua
             just
-            nodejs_18
+            nodejs
+            nufmt
+            nushell
+            carapace # For nu completions
             envsubst # TODO: move this to some separate place
             awscli2
             nodePackages_latest.pnpm
@@ -108,6 +113,7 @@ in
             watchexec
             terraform-ls
             yamllint
+            yaml-language-server
           ])
           ++ [ myPython ]
           ++ vterm-deps;

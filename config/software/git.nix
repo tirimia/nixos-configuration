@@ -15,6 +15,8 @@
       ignores = [
         ".venv"
         ".idea"
+        ".direnv"
+        ".envrc"
       ];
       extraConfig = {
         core = {
