@@ -31,7 +31,6 @@
   (menu-bar-mode -1)                 ;no menubar
   (scroll-bar-mode -1)               ;no scrollbar
   (global-display-line-numbers-mode -1) ;; TODO make weight thin and height 1, also figure out how to shrink the bar
-  (global-hl-line-mode)
   (electric-pair-mode) ;; autocompletes parens _and_ does the enter and indent how I expect it
   (setq ring-bell-function 'ignore)  ;no ringing bells
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -39,33 +38,36 @@
   (setq column-number-mode t)
   (setq make-backup-files nil)
   (setq auto-save-default nil)
-  (setq custom-file null-device)
+  (setq custom-file (make-temp-name "/tmp/"))
   (setq initial-scratch-message nil)
   (setq-default indent-tabs-mode nil
 		            tab-width 2)
   (toggle-frame-maximized)
   (load-theme 'modus-vivendi-tinted)
   (add-to-list 'default-frame-alist '(font . "Iosevka Comfy Wide:pixelsize=20:weight=medium:slant=normal:width=normal:spacing=100:scalable=true"))
-  (defadvice find-file (before make-directory-maybe (filename &optional wildcards) activate)
-    "Create parent directory if not exists while visiting file."
+  (defun make-directory-maybe (orig-fun filename &optional wildcards)
+    "Create parent directory if not exists before visiting file."
     (unless (file-exists-p filename)
       (let ((dir (file-name-directory filename)))
         (unless (file-exists-p dir)
-          (make-directory dir t))))))
+          (make-directory dir t))))
+    (funcall orig-fun filename wildcards))
+  (advice-add 'find-file :around #'make-directory-maybe))
 
 (use-package evil
   :init
-  (setq evil-want-keybinding nil)
+  (setq evil-want-keybinding nil
+        evil-undo-system #'undo-redo)
   :config
   (setq evil-want-keybinding t
-	evil-split-window-below t
-	evil-vsplit-window-right t)
+	      evil-split-window-below t
+	      evil-vsplit-window-right t)
   (evil-mode 1)
   (defun evil-binary-split ()
     "Split the window in two."
     (interactive)
     (if (> (window-pixel-width) (window-pixel-height))
-	(evil-window-vsplit)
+	      (evil-window-vsplit)
       (evil-window-split)))
   ;; (defun new-line-dwim ()
   ;;   "Inserts newline and does the fun double enter back and tab if in a brace"
@@ -82,7 +84,9 @@
   ;;         (indent-for-tab-command)))
   ;;     (indent-for-tab-command)))
   ;; (evil-define-key 'insert prog-mode-map (kbd "RET") #'tirimia/ret-or-tempel-next)
-  (add-to-list 'evil-emacs-state-modes 'dired-mode))
+  (add-to-list 'evil-emacs-state-modes 'dired-mode)
+  (add-to-list 'evil-emacs-state-modes 'special-mode)
+  (add-to-list 'evil-emacs-state-modes 'compilation-mode))
 (use-package evil-multiedit
   :config (evil-multiedit-default-keybinds))
 (use-package evil-escape
@@ -133,16 +137,51 @@
   (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
   (define-key evil-outer-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.outer"))
   (define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.inner")))
+(use-package evil-matchit
+  :config (global-evil-matchit-mode))
 
 (use-package ace-window
   :config (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :bind
   ("M-o" . ace-window))
 
+(use-package flick
+  :vc (:url "https://github.com/tirimia/flick" :rev :newest)
+  :bind ("C-c f" . flick))
+
+(setq display-buffer-alist
+      '(("\\*eldoc\\*"
+         (display-buffer-in-side-window)
+         (side . bottom)
+         (slot . -1)
+         (window-height . 0.3))
+        ("\\*compilation\\*"
+         (display-buffer-in-side-window)
+         (side . bottom)
+         (slot . 1)
+         (window-height . 0.3))))
+
+(defun tirimia/move-to-side-bottom ()
+  "Move buffer to the side window on the bottom."
+  (interactive)
+  (let ((buf (current-buffer))
+        (wind (selected-window)))
+    (display-buffer-in-side-window buf '((side . bottom) (window-height . 0.3)))
+    (delete-window wind)))
+
 (use-package direnv
   :config (direnv-mode))
 
 (use-package magit)
+(use-package forge
+  :after magit
+  :config
+  (setq ghub-use-workaround-for-emacs-bug 'force)
+  
+  (defun ghub-token-from-gh (host username package &optional nocreate forge)
+    (string-trim (shell-command-to-string "gh auth token")))
+  
+  (advice-add 'ghub--token :override #'ghub-token-from-gh))
 
 (use-package which-key
   :config (which-key-mode))
@@ -154,31 +193,32 @@
   ;; Without this statement, the motion state SPC being bound completely messes up the other bindings.
   (general-def :states '(motion) "SPC" nil)
   (tirimia/leader-def
-   "SPC" '(consult-buffer :wk "Switch")
-   "'" (list (lambda () (interactive) (vterm t)) :which-key "Shell")
-   "/" '(consult-ripgrep :wk "Project search")
-   "c" '(kill-buffer-and-window :wk "Close")
-   "f" '(find-file :wk "Find file")
-   "g" '(magit-status :wk "Magit")
-   "h" '(helpful-symbol :which-key "Help")
-   "k" '(kill-current-buffer :wk "Kill current buffer")
+    "SPC" '(consult-buffer :wk "Switch")
+    "'" (list (lambda () (interactive) (vterm t)) :which-key "Shell")
+    "/" '(consult-ripgrep :wk "Project search")
+    "c" '(kill-buffer-and-window :wk "Close")
+    "f" '(find-file :wk "Find file")
+    "g" '(magit-status :wk "Magit")
+    "h" '(helpful-symbol :which-key "Help")
+    "k" '(kill-current-buffer :wk "Kill current buffer")
 
-   "m" '(:ignore t :which-key "Meta")
-   "mc" '(compile :which-key "Compile")
-   "mr" '(project-compile :which-key "Compile in root")
-   "mm" '(recompile :which-key "Recompile")
-   "ms" '(recompile-on-save-mode :which-key "Toggle autorecompile")
+    "m" '(:ignore t :which-key "Meta")
+    "mc" '(compile :which-key "Compile")
+    "mr" '(project-compile :which-key "Compile in root")
+    "mm" '(recompile :which-key "Recompile")
+    "ms" '(recompile-on-save-mode :which-key "Toggle autorecompile")
 
-   ;; TODO: consider flymake-show-diagnostics-buffer
-   "te" '(consult-flymake :wk "Go to error")
-   "tl" '(global-display-line-numbers-mode :wk "Line numbers")
+    ;; TODO: consider flymake-show-diagnostics-buffer
+    "te" '(consult-flymake :wk "Go to error")
+    "tl" '(global-display-line-numbers-mode :wk "Line numbers")
+    "ts" '(flick :wk "Make side window")
 
-   "w" '(:ignore t :wk "Window")
-   "wd" '(evil-window-delete :wk "Delete")
-   "ws" '(evil-window-split :wk "Split")
-   "wv" '(evil-window-vsplit :wk "VSplit")
-   "ww" '(evil-binary-split :wk "Smart Split")
-   ))
+    "w" '(:ignore t :wk "Window")
+    "wd" '(evil-window-delete :wk "Delete")
+    "ws" '(evil-window-split :wk "Split")
+    "wv" '(evil-window-vsplit :wk "VSplit")
+    "ww" '(evil-binary-split :wk "Smart Split")
+    ))
 
 (use-package vterm
   :init (setq-default vterm-always-compile-module t)
@@ -199,8 +239,13 @@
 
 (use-package vertico
   :config
-  (vertico-mode)
-  (setq completion-styles '(flex)))
+  (vertico-mode))
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (orderless-matching-styles '(orderless-flex)))
 
 (use-package marginalia
   :config (marginalia-mode))
@@ -216,11 +261,6 @@
                    '("/nix/store/" "~/.cargo/registry"))))
   :config
   (projectile-mode))
-
-(use-package smartparens
-  :config
-  (require 'smartparens-config)
-  (smartparens-global-mode))
 
 (use-package smart-delete
   :hook (prog-mode . smart-delete-mode))
@@ -239,18 +279,22 @@
   :disabled
   :config
   (defun tirimia/install-nerd-icons-if-necessary ()
-    "Only installs nerd icons if necessary (aka core font not found)"
+    "Only ins necessary (aka core font not found)"
     (unless (ignore-errors (find-font (font-spec :family "Symbols Nerd Font Mono")))
       (nerd-icons-install-fonts t)))
   (tirimia/install-nerd-icons-if-necessary))
 
-(use-package awesome-tray
-  :vc (:url "https://github.com/manateelazycat/awesome-tray" :rev :newest)
-  :init
-  (setq awesome-tray-active-modules '("evil" "location" "buffer-name" "git" "flymake" "mode-name")
-	      awesome-tray-second-line t
-	      awesome-tray-position 'center)
-  :config (awesome-tray-mode))
+(use-package telephone-line
+  :config (telephone-line-mode))
+
+(use-package indent-guide
+  :config (indent-guide-global-mode))
+
+(use-package dtrt-indent
+  :config (dtrt-indent-global-mode))
+
+(use-package rainbow-delimiters
+  :hook prog-mode)
 
 (use-package ligature
   :config
@@ -298,7 +342,11 @@
     (setq eldoc-documentation-functions
           (remove #'flymake-eldoc-function eldoc-documentation-functions)))
   :hook prog-mode
-  :config (add-hook 'flymake-mode-hook #'tirimia/disable-flymake-eldoc))
+  :config
+  (add-hook 'flymake-mode-hook #'tirimia/disable-flymake-eldoc)
+  (setq flymake-show-diagnostics-at-end-of-line 'short))
+
+(use-package package-lint)
 
 (use-package flymake-diagnostic-at-point
   :config
@@ -346,28 +394,48 @@
   ;; TODO: look into eglot-x for fancy rust-analyzer stuff
   ;; TODO: find better way to xref
   :bind (:map eglot-mode-map
-	      ("s-l a" . eglot-code-actions)
-	      ("s-l r" . eglot-rename)
-	      ("s-l =" . eglot-format-buffer)
-	      ("s-l h" . eldoc-print-current-symbol-info))
+	            ("s-l a" . eglot-code-actions)
+	            ("s-l r" . eglot-rename)
+	            ("s-l =" . eglot-format-buffer)
+	            ("s-l h" . eldoc-print-current-symbol-info))
   :config
   (add-to-list 'evil-motion-state-modes 'xref--xref-buffer-mode)
   (add-hook 'eglot-managed-mode-hook (lambda () (add-hook 'before-save-hook #'eglot-format-buffer t t))))
-;; :bind (:map evil-normal-state-map
-;;           ("gr" . xref-find))
 
+(use-package tempel
+  :config
+  (defun tempel-setup-capf ()
+    ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;; `tempel-expand' only triggers on exact matches. Alternatively use
+    ;; `tempel-complete' if you want to see all matches, but then you
+    ;; should also configure `tempel-trigger-prefix', such that Tempel
+    ;; does not trigger too often when you don't expect it. NOTE: We add
+    ;; `tempel-expand' *before* the main programming mode Capf, such
+    ;; that it will be tried first.
+    (setq-local completion-at-point-functions
+                (cons #'tempel-expand
+                      completion-at-point-functions))))
 (use-package yasnippet
-  :bind (:map yas-keymap
-              ("RET" . yas-next-field)
-              ("TAB" . nil)))
+  :bind
+  (:map evil-insert-state-map
+        ("C-p" . yas-insert-snippet)
+        :map yas-keymap
+        ("RET" . yas-next-field)
+        ("TAB" . nil)))
 (yas-global-mode 1) ;; Still don't understand why this doesn't work inside the :config property of the yasnippet use package
+
+(use-package templateforge
+  :vc t
+  :load-path "~/Personal/templateforge/"
+  :config (templateforge-mode 1))
+
 (use-package aas
   ;; TODO: decide how to structure this: snippets with the modes or all in this block
   ;; TODO: have another function that you can just pass the suffixes and templates and it does the rest and you can expand it in the aas-set-snipets block
   :config
   (defun tirimia/surround-postfix (suffix snippet-name mode)
     "Generate function for aas to have access via SUFFIX to yasnippet named SNIPPET-NAME for MODE that need to select the previous word.
-Example usage:
+  Example usage:
   (aas-set-snippets 'emacs-lisp-mode
     \".he\" (tirimia/surround-postfix \".he\" \"laugh-snip\" 'emacs-lisp-mode))
   "
@@ -380,9 +448,22 @@ Example usage:
          (set-mark (point))
          (search-backward-regexp (rx symbol-start))
          (yas-expand-snippet ,snip))))
-  (aas-set-snippets 'global
-    "cmm " '(yas "`comment-start` ")
-    "todo " '(yas "`comment-start` TODO: "))
+  (defun tirimia/aas-set-yas-for-mode (mode snips)
+    "Set yasnippets for MODE in bulk via lookups in SNIPS."
+    (interactive)
+    (apply #'aas-set-snippets mode
+           (apply #'append
+                  (mapcar
+                   (lambda (pair)
+                     (let ((shortcut (car pair)) (snippet-name (cdr pair)))
+                       `(,shortcut (yas ,(yas-lookup-snippet snippet-name mode)))))
+                   snips))))
+  ;; (aas-set-snippets 'global
+  ;;   "cmm " '(yas "`comment-start`")
+  ;;   "todo " '(yas "`comment-start`TODO: "))
+  (tirimia/aas-set-yas-for-mode 'prog-mode
+                                '(("cmm " . "comment")
+                                  ("todo " . "todo")))
   (aas-set-snippets 'emacs-lisp-mode
     "usp "   '(yas "(use-package $0)"))
   (aas-set-snippets 'python-base-mode
@@ -397,11 +478,12 @@ Example usage:
     )
   (aas-set-snippets 'nix-ts-mode
     "dbg" '(yas "dbg!(`(let ((node (treesit-node-at (point))))
-         (if node (treesit-node-text node t) \"\"))`)$0"))
-  (aas-global-mode)
-  :hook (emacs-lisp-mode . aas-activate-for-major-mode)
-  :hook (python-base-mode . aas-activate-for-major-mode)
-  :hook (typescript-ts-base-mode . aas-activate-for-major-mode))
+                         (if node (treesit-node-text node t) \"\"))`)$0"))
+  (defun tirimia/aas-init ()
+    "Set up aas for the global keymap."
+    (interactive)
+    (aas-activate-keymap 'global)
+    (aas-activate-for-major-mode)))
 
 (use-package cape
   :config
@@ -442,8 +524,9 @@ Example usage:
   (defun tirimia/emacs-lisp-setup ()
     "Goodies for elisp."
     (interactive)
-    (setq-local comment-start ";;")
-    (aggressive-indent-mode))
+    (setq-local comment-start ";; ")
+  (tirimia/aas-init)
+  (aggressive-indent-mode))
   (add-hook 'emacs-lisp-mode-hook #'tirimia/emacs-lisp-setup))
 
 (use-package go-ts-mode
@@ -455,6 +538,7 @@ Example usage:
     (interactive)
     (setq-local eglot-workspace-configuration
                 '((:gopls . ((gofumpt . t)))))
+    (tirimia/aas-init)
     (eglot-ensure))
   (add-hook 'go-ts-mode-hook #'tirimia/go-setup))
 
@@ -478,14 +562,14 @@ Example usage:
     "clg " '(yas "console.log($1)$0")
     "cdest " '(yas "const { ${2:items} } = $1;$0")
     "impf" '(yas "import { ${2:import} } from '${1:from}';")
-    "tgg" '(yas "<${1:tag}>$0</$1>"))
+    "tgg" '(yas "<${1:tag}>$0</$1>")
+    "tgc" '(yas "<$1 />$0"))
   (defun tirimia/ts-setup ()
     "Customizations."
     (interactive)
-    (aas-activate-for-major-mode)
+    (tirimia/aas-init)
     (eglot-ensure))
-  :hook ((typescript-ts-mode . tirimia/ts-setup)
-	       (tsx-ts-mode . tirimia/ts-setup)))
+  :hook (typescript-ts-base-mode . tirimia/ts-setup))
 
 (use-package yaml-ts-mode
   :ensure nil
@@ -518,7 +602,7 @@ Example usage:
   (defun tirimia/haskell-setup ()
     "Setup for the maff GOAT."
     (interactive)
-    (aas-activate-for-major-mode)
+    (tirimia/aas-init)
     (lsp-deferred))
   :hook (haskell-mode . tirimia/haskell-setup))
 
@@ -532,13 +616,49 @@ Example usage:
 
 (use-package elixir-ts-mode
   :ensure nil
+  :mode
+  "\\.elixir\\'"
+  "\\.ex\\'"
+  "\\.exs\\'"
+  "\\mix.lock\\'"
   :config
+  (tirimia/aas-set-yas-for-mode 'heex-ts-mode
+                                '(("tgg " . "tag")
+                                  ("tgc " . "self-closing tag")))
+  (tirimia/aas-set-yas-for-mode 'elixir-ts-mode
+                                '(("kk " . "ok tuple")
+                                  ("km " . "ok match")
+                                  ("errm " . "error match")
+                                  ("asseq " . "assert equals")))
   (defun tirimia/elixir-setup ()
     "Liquid gold."
     (interactive)
+    (tirimia/aas-init)
     (setq-local eglot-server-programs '((elixir-mode "elixir-ls")))
     (eglot-ensure))
-  :hook (elixir-ts-mode . tirimia/elixir-setup))
+  (defun tirimia/heex-setup ()
+    "Template."
+    (interactive)
+    (tirimia/aas-init))
+  :hook
+  (elixir-ts-mode . tirimia/elixir-setup)
+  (heex-ts-mode . tirimia/elixir-setup))
+
+(use-package kotlin-ts-mode
+  :mode (rx ".kt" (? "s") eos)
+  :config
+  (defun tirimia/kotlin-setup ()
+    "Kotlincho."
+    (interactive)
+    (setq-local eglot-server-programs '((kotlin-ts-mode "kotlin-lsp" "--stdio"))
+                eglot-autoshutdown t
+                eglot-extend-to-xref t
+                eglot-sync-connect 1
+                eglot-connect-timeout 99999 ;; Inits take ages
+                eglot-report-progress t)
+    (eglot-ensure))
+  :hook
+  (kotlin-ts-mode . tirimia/kotlin-setup))
 
 ;; Org
 (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
@@ -553,6 +673,7 @@ Example usage:
 (use-package org-modern
   :config (global-org-modern-mode))
 (defun tirimia/agenda ()
+  "Show agenda."
   (interactive)
   (org-agenda nil "a"))
 (setq org-agenda-custom-commands
@@ -731,9 +852,9 @@ Example usage:
   [remap evil-save-and-close] #'org-edit-src-exit
   [remap evil-quit] #'org-edit-src-abort)
 (defun tirimia/org-agenda-switch-to-improved ()
-  "Improve org-switch-to for roam-daily-users. If cursor is on a
-date heading, the function originally throws an error. With this
-added :around, it goes to capture the respective daily note"
+  "Improve org-switch-to for roam-daily-users.
+If cursor is on a date heading, the function originally throws an error.
+With this added :around, it goes to capture the respective daily note"
   (interactive)
   (condition-case nil
       (org-agenda-switch-to)

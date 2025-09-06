@@ -24,6 +24,7 @@
     trusted-users = [ user ];
   };
   programs.zsh.enable = true;
+  system.primaryUser = user;
   system.defaults = {
     dock.autohide = true;
   };
@@ -49,6 +50,7 @@
           pkgs.kubie
           pkgs.skaffold
           pkgs.k9s
+          pkgs.flox
           (pkgs.google-cloud-sdk.withExtraComponents (
             with pkgs.google-cloud-sdk.components;
             [

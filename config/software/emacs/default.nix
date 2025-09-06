@@ -20,7 +20,6 @@ let
       sexpdata
       six
       packaging
-      ruff-lsp
     ]
   );
   libExtension = if pkgs.system == "aarch64-darwin" then "dylib" else "so";
@@ -82,13 +81,16 @@ in
             golangci-lint-langserver
             gopls
             gotools
+            kotlin-lsp
             lua
             just
+            openjdk
             nodejs
             nufmt
             nushell
             carapace # For nu completions
             envsubst # TODO: move this to some separate place
+            protobuf
             awscli2
             nodePackages_latest.pnpm
             nodePackages_latest.typescript

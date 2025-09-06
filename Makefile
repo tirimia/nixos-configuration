@@ -5,7 +5,7 @@ endif
 NIX_REBUILD := sudo nixos-rebuild --flake .\#$(HOSTNAME)
 
 .PHONY: mac-switch
-mac-switch: ; darwin-rebuild switch --flake .
+mac-switch: ; sudo darwin-rebuild switch --flake .
 
 .PHONY: test switch upgrade rollback
 test:		; $(NIX_REBUILD) test

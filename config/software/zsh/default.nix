@@ -29,7 +29,7 @@
           gcm = "git commit -m";
           ll = "ls -lathrs";
         };
-        initExtra = ''
+        initContent = ''
           if [[ -r "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh" ]]; then
              source "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh"
           fi

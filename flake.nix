@@ -1,6 +1,11 @@
 {
   description = "tirimia NixOS configs";
 
+  nixConfig = {
+    extra-trusted-substituters = [ "https://cache.flox.dev" ];
+    extra-trusted-public-keys = [ "flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs=" ];
+  };
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
@@ -22,6 +27,8 @@
       url = "github:virchau13/tree-sitter-astro";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    flox.url = "github:flox/flox";
   };
   outputs =
     inputs:
@@ -51,6 +58,12 @@
             inputs.tree-sitter-astro.overlays.default
             (final: prev: {
               inherit (inputs.nix-linter.legacyPackages.${system}) nix-linter;
+            })
+            (final: prev: {
+              inherit (inputs.flox.packages.${system}) flox;
+            })
+            (final: prev: {
+              kotlin-lsp = final.callPackage ./temporary_recipes/kotlin-lsp.nix { };
             })
           ];
           inherit system;
