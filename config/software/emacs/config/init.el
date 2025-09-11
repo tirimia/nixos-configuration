@@ -568,6 +568,16 @@
     "Customizations."
     (interactive)
     (tirimia/aas-init)
+    (setq-local eglot-server-programs
+                `((typescript-ts-base-mode
+                   . ("typescript-language-server" "--stdio"
+                      :initializationOptions
+                      (:preferences
+                       (
+                        :includeInlayParameterNameHints "literals"
+                        :includeInlayFunctionParameterTypeHints t
+                        :includeInlayVariableTypeHints :json-false
+                        ))))))
     (eglot-ensure))
   :hook (typescript-ts-base-mode . tirimia/ts-setup))
 
