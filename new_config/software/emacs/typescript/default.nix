@@ -10,6 +10,6 @@
         eslint_d
       ];
 
-      programs.emacs.extraConfig = builtins.readFile ./config.el;
+      home.file.".config/emacs/init.el".text = builtins.readFile ./config.el;
     };
 }

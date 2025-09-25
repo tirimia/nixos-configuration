@@ -11,9 +11,13 @@
             use-package
             eglot
             yasnippet
-            aas
+            evil
+            evil-textobj-tree-sitter
+            telephone-line
+            org-contacts
+            tree-sitter tree-sitter-langs treesit-grammars.with-all-grammars
           ];
-        extraConfig = lib.mkBefore (builtins.readFile ./config.el);
       };
+      home.file.".config/emacs/init.el".text = lib.mkBefore (builtins.readFile ./config.el);
     };
 }
