@@ -1,4 +1,5 @@
-{inputs, ...}: {
+{ inputs, ... }:
+{
   flake.darwinConfigurations = {
     trv3692 = inputs.darwin.lib.darwinSystem rec {
       system = "aarch64-darwin";
@@ -9,7 +10,7 @@
         inputs.home-manager.darwinModules.default
         inputs.self.modules.darwin.general
         inputs.self.modules.darwin.tirimiaUser
-        {system.primaryUser = "tirimia";}
+        { system.primaryUser = "tirimia"; }
         inputs.self.modules.darwin.nix-settings
       ];
     };

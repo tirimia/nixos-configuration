@@ -4,6 +4,7 @@
     { pkgs, ... }:
     {
       home.packages = with pkgs; [
+        bun
         typescript-language-server
         typescript
         nodePackages.prettier

@@ -158,7 +158,7 @@
   :hook prog-mode
   :config
   (add-hook 'flymake-mode-hook #'tirimia/disable-flymake-eldoc)
-  (setq flymake-show-diagnostics-at-end-of-line 'short))
+  (setq flymake-show-diagnostics-at-end-of-line nil))
 
 (use-package eldoc-box
   :bind
@@ -236,12 +236,14 @@
 
 (use-package cape
   :config
+  (setq dabbrev-case-fold-search t) ;; Ignore case when dabbreving
   (add-hook 'eglot-managed-mode-hook
 	          (lambda ()
-	            (setq completion-at-point-functions
-		                (list #'eglot-completion-at-point
-			                    #'cape-file
-			                    #'cape-dabbrev)))))
+              (setq completion-at-point-functions
+                    (list (cape-capf-super
+                           #'eglot-completion-at-point
+                           #'cape-dabbrev)
+                          #'cape-file)))))
 (use-package corfu
   :init
   (global-corfu-mode)
@@ -273,7 +275,7 @@
     "Goodies for elisp."
     (interactive)
     (setq-local comment-start ";; ")
-  (aggressive-indent-mode))
+    (aggressive-indent-mode))
   (add-hook 'emacs-lisp-mode-hook #'tirimia/emacs-lisp-setup))
 
 (use-package rainbow-delimiters
@@ -414,11 +416,13 @@
   :bind
   (("M-g M-g" . consult-goto-line)
    ("M-y" . consult-yank-pop))
-  :config (setq
-           consult-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --with-filename --line-number --search-zip --hidden --glob=!.git/ --glob=!vendor/"))
-(use-package consult-projectile
   :config
   (require 'consult-xref)
+  (setq consult-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --with-filename --line-number --search-zip --hidden --glob=!.git/ --glob=!vendor/"
+        xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref))
+(use-package consult-projectile
+  :config
   (setq consult-buffer-sources '(consult--source-buffer consult-projectile--source-projectile-file consult-projectile--source-projectile-project)))
 
 (use-package telephone-line
@@ -432,9 +436,16 @@
 	            ("s-l =" . eglot-format-buffer)
 	            ("s-l h" . eldoc-print-current-symbol-info))
   :config
+  (setq eglot-autoshutdown t)
   ;; Make eglot highlight better, lsp-mode style
   (custom-set-faces '(eglot-highlight-symbol-face ((t (:inherit lazy-highlight)))))
   (add-hook 'eglot-managed-mode-hook (lambda () (add-hook 'before-save-hook #'eglot-format-buffer t t))))
+
+(use-package eglot-codelens
+  :after eglot
+  :vc (:url "https://github.com/Gavinok/eglot-codelens" :rev :newest)
+  :config
+  (add-hook 'eglot-managed-mode-hook #'eglot-codelens-mode))
 
 (use-package nix-ts-mode
   :mode "\\.nix\\'"
@@ -442,6 +453,11 @@
 
 (use-package astro-ts-mode
   :mode (rx ".astro" eos))
+
+(use-package just-mode
+  :after eglot
+  :hook (just-mode . eglot-ensure)
+  :config (add-to-list 'eglot-server-programs '(just-mode . ("just-lsp"))))
 
 ;; Org
 (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
