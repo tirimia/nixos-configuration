@@ -12,10 +12,10 @@
         hlint
       ];
       home.file.".config/ghc/ghci.conf".text = ''
-       :set prompt "\x03BB> "
-       :set prompt-cont " > "
-       :set +s
-       :seti -XOverloadedStrings
+        :set prompt "\x03BB> "
+        :set prompt-cont " > "
+        :set +s
+        :seti -XOverloadedStrings
       '';
       home.file.".config/emacs/init.el".text = ''
         (use-package haskell-mode

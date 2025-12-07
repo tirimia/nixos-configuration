@@ -516,7 +516,7 @@
       org-agenda-span 14
       org-agenda-start-with-log-mode t
       org-log-done 'time
-      calendar-location-name "Dusseldorf, Germany"
+      calendar-location-name "Hamburg, Germany"
       calendar-longitude 6.78
       calendar-latitude 51.2
       org-default-notes-file "~/MEGA/Org/Agenda.org"
