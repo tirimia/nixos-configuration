@@ -1,0 +1,51 @@
+========== text-mode
+===== today
+`(format-time-string "%Y-%m-%d")`$0
+========== prog-mode
+===== comment
+`comment-start`$0
+===== todo
+`comment-start`TODO: $0
+===== fixme
+`comment-start`FIXME: $0
+========== typescript-ts-mode tsx-ts-mode
+===== impf
+import { ${2:exports} } from '${1:lib}';$0
+========== tsx-ts-mode
+===== component
+export interface $1Props {
+       $3
+}
+export function ${1:ComponentName}({$4}: $1Props) {
+       $0
+       return <></>
+}
+===== self-closing tag
+<${1:tag} />$0
+===== tag
+<${1:tag}${2}>$0</$1>
+========== elixir-mode elixir-ts-mode heex-ts-mode
+===== dmod
+defmodule $1
+===== hsig
+~H"""
+  $1
+"""
+===== render
+def render(assigns) do
+    ~H"""
+      $0
+    """
+end
+===== self-closing tag
+<${1:tag} />$0
+===== tag
+<${1:tag}${2}>$0</$1>
+===== ok tuple
+{:ok, $1} = $0
+===== ok match
+{:ok, $1} -> $0
+===== error match
+{:error, $1} -> $0
+===== assert equals
+assert $1 == $0
