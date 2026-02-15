@@ -4,6 +4,8 @@
     { pkgs, ... }:
     {
       home.packages = [
+        pkgs.fd
+        pkgs.coreutils
         pkgs.jq
         pkgs.yq
         pkgs.kubectl

@@ -14,7 +14,10 @@
       home.file.".config/ghc/ghci.conf".text = ''
         :set prompt "\x03BB> "
         :set prompt-cont " > "
+        -- show time/mem usage
         :set +s
+        -- show type of every expression
+        :set +t
         :seti -XOverloadedStrings
       '';
       home.file.".config/emacs/init.el".text = ''

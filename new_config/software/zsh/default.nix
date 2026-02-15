@@ -1,7 +1,7 @@
 { inputs, ... }:
 {
   flake.modules.homeManager.zsh =
-    { pkgs, ... }:
+    { pkgs, config, ... }:
     {
       programs.zsh = {
         enable = true;
@@ -12,7 +12,7 @@
           save = 1000000;
           size = 1000000;
         };
-        dotDir = ".config/zsh";
+        dotDir = "${config.xdg.configHome}/zsh";
         shellAliases = {
           cdr = "cd `git rev-parse --show-toplevel`";
           gs = "git status";
@@ -73,7 +73,7 @@
           zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
           eval "$(direnv hook zsh)"
           export CLICOLOR=1 # pretty colors
-          export PATH=~/.cargo/bin:$PATH
+          export PATH=~/.local/bin:~/.cargo/bin:$PATH
 
           source ~/.config/zsh/powerlevel10k.zsh
         '';

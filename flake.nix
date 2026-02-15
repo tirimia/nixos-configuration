@@ -30,6 +30,7 @@
     fenix.url = "github:nix-community/fenix";
     fenix.inputs.nixpkgs.follows = "nixpkgs";
     flox.url = "github:flox/flox";
+    expert-lsp.url = "github:elixir-lang/expert";
   };
   # outputs =
   #   inputs:

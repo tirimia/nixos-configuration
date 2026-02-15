@@ -16,6 +16,7 @@
       home-manager.users.tirimia = {
         imports = [
           inputs.self.modules.homeManager.emacs
+          inputs.self.modules.homeManager.neovim
           inputs.self.modules.homeManager.direnv
           inputs.self.modules.homeManager.sre
           inputs.self.modules.homeManager.git

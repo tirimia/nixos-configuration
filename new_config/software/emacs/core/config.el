@@ -1,3 +1,5 @@
+(setq gc-cons-threshold (* 50 1024 1024))
+
 (setq package-archives '(("org" . "https://orgmode.org/elpa/")
                          ("melpa" . "https://melpa.org/packages/")
                          ("gnu" . "https://elpa.gnu.org/packages/")))
@@ -34,8 +36,8 @@
   (setq-default indent-tabs-mode nil
 		            tab-width 2)
   (toggle-frame-maximized)
-  (load-theme 'modus-vivendi-tinted)
-  (add-to-list 'default-frame-alist '(font . "Iosevka Comfy Wide:pixelsize=20:weight=medium:slant=normal:width=normal:spacing=100:scalable=true"))
+  (load-theme 'modus-vivendi)
+  (add-to-list 'default-frame-alist '(font . "Iosevka Comfy Wide:pixelsize=14:weight=medium:slant=normal:width=normal:spacing=100:scalable=true"))
   (defun make-directory-maybe (orig-fun filename &optional wildcards)
     "Create parent directory if not exists before visiting file."
     (unless (file-exists-p filename)
@@ -45,6 +47,9 @@
     (funcall orig-fun filename wildcards))
   (advice-add 'find-file :around #'make-directory-maybe))
 
+(use-package centered-cursor-mode
+  :custom (ccm-recenter-at-end-of-file t)
+  :config (global-centered-cursor-mode))
 (use-package evil
   :init
   (setq evil-want-keybinding nil
@@ -62,16 +67,9 @@
       (evil-window-split)))
   (evil-define-key 'normal 'global (kbd "gr") 'xref-find-references)
   (add-to-list 'evil-emacs-state-modes 'dired-mode)
-  (add-to-list 'evil-emacs-state-modes 'special-mode)
-  (add-to-list 'evil-emacs-state-modes 'compilation-mode))
+  (add-to-list 'evil-emacs-state-modes 'special-mode))
 (use-package evil-multiedit
   :config (evil-multiedit-default-keybinds))
-(use-package evil-escape
-  :config
-  (setq evil-escape-key-sequence "jk")
-  (setq evil-escape-unordered-key-sequence t)
-  (setq evil-escape-delay 0.15)
-  (evil-escape-mode))
 (use-package evil-snipe
   :config
   (evil-snipe-mode 1)
@@ -125,8 +123,6 @@
          (slot . 1)
          (window-height . 0.3))))
 
-
-
 (use-package aggressive-indent)
 
 (use-package smart-delete
@@ -142,9 +138,8 @@
   (tirimia/install-nerd-icons-if-necessary))
 
 
-(use-package indent-guide
-  :config (indent-guide-global-mode))
-
+(use-package highlight-indentation
+  :config (highlight-indentation-mode))
 (use-package package-lint)
 
 
@@ -173,8 +168,8 @@
   :after posframe
   :config
   (defun flymake-diagnostic-at-point-get-diagnostic-text ()
-  "Overwriting since flymake--diag-text is deprecated."
-  (flymake-diagnostic-text (get-char-property (point) 'flymake-diagnostic)))
+    "Overwriting since flymake--diag-text is deprecated."
+    (flymake-diagnostic-text (get-char-property (point) 'flymake-diagnostic)))
   (defun tirimia/flymake-at-point ()
     "Interactive wrapper around `flymake-diagnostic-at-point-maybe-display'."
     (interactive) (flymake-diagnostic-at-point-maybe-display))
@@ -228,6 +223,8 @@
         ("RET" . yas-next-field)
         ("TAB" . nil)))
 (yas-global-mode 1) ;; Still don't understand why this doesn't work inside the :config property of the yasnippet use package
+(use-package yasnippet-capf
+  :after yasnippet)
 
 (use-package templateforge
   :vc t
@@ -235,15 +232,34 @@
   :config (templateforge-mode 1))
 
 (use-package cape
+  :after yasnippet-capf
   :config
-  (setq dabbrev-case-fold-search t) ;; Ignore case when dabbreving
-  (add-hook 'eglot-managed-mode-hook
-	          (lambda ()
-              (setq completion-at-point-functions
-                    (list (cape-capf-super
-                           #'eglot-completion-at-point
-                           #'cape-dabbrev)
-                          #'cape-file)))))
+  (setq dabbrev-case-fold-search t)
+  (defvar tirimia/base-capfs (list #'yasnippet-capf #'cape-dabbrev)
+    "Base completion backends shared across all modes.")
+  (defun tirimia/setup-base-completion ()
+    "Base completion: snippets + dabbrev + file."
+    (setq-local completion-at-point-functions
+                (list (apply #'cape-capf-super tirimia/base-capfs)
+                      #'cape-file)))
+  (defun tirimia/setup-eglot-completion ()
+    "Eglot completion: merge LSP with base backends, then file."
+    (setq-local completion-at-point-functions
+                (list (apply #'cape-capf-super
+                             (cape-capf-properties #'eglot-completion-at-point :exclusive 'no)
+                             tirimia/base-capfs)
+                      #'cape-file)))
+  (defun tirimia/setup-elisp-completion ()
+    "Elisp completion: merge elisp + base backends, then file."
+    (setq-local completion-at-point-functions
+                (list (apply #'cape-capf-super
+                             #'elisp-completion-at-point
+                             tirimia/base-capfs)
+                      #'cape-file)))
+  (add-hook 'prog-mode-hook #'tirimia/setup-base-completion)
+  (add-hook 'text-mode-hook #'tirimia/setup-base-completion)
+  (add-hook 'emacs-lisp-mode-hook #'tirimia/setup-elisp-completion)
+  (add-hook 'eglot-managed-mode-hook #'tirimia/setup-eglot-completion))
 (use-package corfu
   :init
   (global-corfu-mode)
@@ -266,6 +282,7 @@
 
 (use-package recompile-on-save)
 (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+(evil-define-key 'motion compilation-mode-map "r" #'recompile)
 
 (use-package emacs-lisp-mode
   :no-require t ;; Do not remove this, causes the hook at the end to stack overflow
@@ -280,31 +297,6 @@
 
 (use-package rainbow-delimiters
   :hook prog-mode)
-
-(use-package ligature
-  :config
-  ;; Enable the "www" ligature in every possible major mode
-  (ligature-set-ligatures 't '("www"))
-  ;; Enable traditional ligature support in eww-mode, if the
-  ;; `variable-pitch' face supports it
-  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-  ;; Enable all Cascadia Code ligatures in programming modes
-  (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
-                                       ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
-                                       "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
-                                       "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
-                                       "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
-                                       "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
-                                       "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
-                                       "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
-                                       ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
-                                       "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
-                                       "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
-                                       "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
-                                       "\\\\" "://"))
-  ;; Enables ligature checks globally in all buffers. You can also do it
-  ;; per mode with `ligature-mode'.
-  (global-ligature-mode t))
 
 (use-package which-key
   :config (which-key-mode))
@@ -360,17 +352,6 @@
   :config (direnv-mode))
 
 (use-package magit)
-(use-package forge
-  :after magit
-  :config
-  (setq ghub-use-workaround-for-emacs-bug 'force)
-
-  (defun ghub-token-from-gh (host username package &optional nocreate forge)
-    (string-trim (shell-command-to-string "gh auth token")))
-
-  (advice-add 'ghub--token :override #'ghub-token-from-gh))
-
-
 
 (use-package vterm
   :init (setq-default vterm-always-compile-module t)
@@ -390,12 +371,22 @@
 (use-package vertico
   :config
   (vertico-mode))
+(use-package vertico-posframe
+  :after vertico
+  :config
+  (setq vertico-posframe-poshandler #'posframe-poshandler-frame-center)
+  (vertico-posframe-mode 1))
+
+(use-package hotfuzz
+  :config
+  (setq completion-styles '(hotfuzz orderless basic))
+  (setq hotfuzz-max-highlighted-completions 0)) ;; let vertico handle highlighting
 
 (use-package orderless
   :ensure t
   :custom
-  (completion-styles '(orderless basic))
-  (orderless-matching-styles '(orderless-flex)))
+  (completion-styles '(hotfuzz orderless basic))
+  (orderless-matching-styles '(orderless-literal orderless-flex)))
 
 (use-package marginalia
   :config (marginalia-mode))
@@ -404,7 +395,7 @@
   :custom
   (projectile-completion-system 'auto)
   (projectile-indexing-method 'alien)
-  (projectile-enable-caching nil)
+  (projectile-enable-caching t)
   (projectile-ignored-project-function
    (lambda (path) (cl-some
                    (lambda (prefix) (string-prefix-p prefix path))
@@ -425,8 +416,26 @@
   :config
   (setq consult-buffer-sources '(consult--source-buffer consult-projectile--source-projectile-file consult-projectile--source-projectile-project)))
 
-(use-package telephone-line
-  :config (telephone-line-mode))
+(use-package mini-modeline
+  :config
+  (setq mini-modeline-r-format
+        '("%e"
+          (:eval (cond (buffer-read-only " [RO] ")
+                       ((buffer-modified-p) " [+] ")
+                       (t " ")))
+          "%b"
+          (:eval (when (and (bound-and-true-p projectile-mode)
+                            (projectile-project-p)
+                            (not (string= (projectile-project-name) "-")))
+                   (format " (%s)" (projectile-project-name))))
+          "  %l:%c"
+          "  %m"
+          (:eval (when (bound-and-true-p flymake-mode)
+                   (concat " " (format-mode-line flymake-mode-line-counters)))))
+        mini-modeline-l-format nil
+        mini-modeline-truncate-p t
+        mini-modeline-face-attr nil)
+  (mini-modeline-mode t))
 
 (use-package eglot
   :ensure nil
@@ -439,13 +448,25 @@
   (setq eglot-autoshutdown t)
   ;; Make eglot highlight better, lsp-mode style
   (custom-set-faces '(eglot-highlight-symbol-face ((t (:inherit lazy-highlight)))))
-  (add-hook 'eglot-managed-mode-hook (lambda () (add-hook 'before-save-hook #'eglot-format-buffer t t))))
+  (defun tirimia/eglot-format-buffer-on-save ()
+    "Format buffer via eglot, logging errors without blocking save."
+    (condition-case err
+        (eglot-format-buffer)
+      (error (message "eglot-format-buffer failed: %s" err))))
+  (defun tirimia/eglot-setup-format-on-save ()
+    "Add format-on-save hook for eglot-managed buffers."
+    (add-hook 'before-save-hook #'tirimia/eglot-format-buffer-on-save t t))
+  (add-hook 'eglot-managed-mode-hook #'tirimia/eglot-setup-format-on-save))
 
 (use-package eglot-codelens
   :after eglot
   :vc (:url "https://github.com/Gavinok/eglot-codelens" :rev :newest)
   :config
-  (add-hook 'eglot-managed-mode-hook #'eglot-codelens-mode))
+  (defun tirimia/eglot-codelens-maybe ()
+    "Enable codelens unless in a mode where it causes hangs."
+    (unless (derived-mode-p 'elixir-ts-mode 'heex-ts-mode)
+      (eglot-codelens-mode 1)))
+  (add-hook 'eglot-managed-mode-hook #'tirimia/eglot-codelens-maybe))
 
 (use-package nix-ts-mode
   :mode "\\.nix\\'"
@@ -468,9 +489,7 @@
 (setq-default org-directory "~/MEGA/Org"
               org-startup-folded t
               org-image-actual-width nil
-              org-element-use-cache nil)
-(use-package org-modern
-  :config (global-org-modern-mode))
+)
 (defun tirimia/agenda ()
   "Show agenda."
   (interactive)
@@ -512,7 +531,7 @@
                         (org-agenda-prefix-format "%c : %b %s")
                         (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled)) ;; Only show TODOs without scheduled or deadline timestamps
                         )))))
-      org-agenda-files '("~/MEGA/Org/Agenda.org")
+      org-agenda-files '("~/MEGA/Org/Agenda.org" "~/MEGA/Org/Daily")
       org-agenda-span 14
       org-agenda-start-with-log-mode t
       org-log-done 'time
@@ -588,25 +607,26 @@
   (interactive)
   (org-capture nil "d"))
 (tirimia/leader-def
- "o" '(:ignore t :which-key "Org-Roam")
+  "o" '(:ignore t :which-key "Org-Roam")
 
- "oa" '(tirimia/agenda :which-key "Agenda")
+  "oa" '(tirimia/agenda :which-key "Agenda")
 
- "oc" '(:ignore t :which-key "Capture")
- "oca" '(tirimia/agenda-capture :which-key "Agenda")
- "occ" '(org-roam-capture :which-key "Capture")
- "ocd" '(org-roam-dailies-capture-date :which-key "Daily")
+  "oc" '(:ignore t :which-key "Capture")
+  "oca" '(tirimia/agenda-capture :which-key "Agenda")
+  "occ" '(org-roam-capture :which-key "Capture")
+  "ocd" '(org-roam-dailies-capture-date :which-key "Daily")
+  "oct" '(org-roam-dailies-goto-today :which-key "Today")
 
- "oi" '(org-roam-node-insert :which-key "Insert link to node")
+  "oi" '(org-roam-node-insert :which-key "Insert link to node")
 
- "oo" '(org-roam-node-find :which-key "Find node")
- "os" '(org-id-get-create :which-key "Set headline as node")
+  "oo" '(org-roam-node-find :which-key "Find node")
+  "os" '(org-id-get-create :which-key "Set headline as node")
 
- "ot" '(:ignore t :which-key "Tags")
- "ott" '(org-roam-tag-add :which-key "Add tag")
- "otd" '(org-roam-tag-remove :which-key "Remove tag")
+  "ot" '(:ignore t :which-key "Tags")
+  "ott" '(org-roam-tag-add :which-key "Add tag")
+  "otd" '(org-roam-tag-remove :which-key "Remove tag")
 
- "tw" '(org-roam-ui-mode :which-key "Roam in browser"))
+  "tw" '(org-roam-ui-mode :which-key "Roam in browser"))
 (use-package org-roam-ui
   :after org-roam
   :config

@@ -49,3 +49,6 @@ end
 {:error, $1} -> $0
 ===== assert equals
 assert $1 == $0
+========== emacs-lisp-mode
+===== use-package
+(use-package $1)
