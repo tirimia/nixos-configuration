@@ -419,19 +419,22 @@
 (use-package mini-modeline
   :config
   (setq mini-modeline-r-format
-        '("%e"
-          (:eval (cond (buffer-read-only " [RO] ")
-                       ((buffer-modified-p) " [+] ")
-                       (t " ")))
-          "%b"
-          (:eval (when (and (bound-and-true-p projectile-mode)
-                            (projectile-project-p)
-                            (not (string= (projectile-project-name) "-")))
-                   (format " (%s)" (projectile-project-name))))
-          "  %l:%c"
-          "  %m"
-          (:eval (when (bound-and-true-p flymake-mode)
-                   (concat " " (format-mode-line flymake-mode-line-counters)))))
+        '((:eval
+           (string-join
+            (seq-filter (lambda (item) (and item (not (string-empty-p item))))
+                        (list
+                         (cond (buffer-read-only (propertize "[RO]" 'face 'warning))
+                               ((buffer-modified-p) (propertize "[+]" 'face 'error)))
+                         (propertize (buffer-name) 'face 'font-lock-keyword-face)
+                         (when (and (bound-and-true-p projectile-mode)
+                                    (projectile-project-p)
+                                    (not (string= (projectile-project-name) "-")))
+                           (propertize (format "(%s)" (projectile-project-name)) 'face 'font-lock-comment-face))
+                         (propertize (format-mode-line "%l:%c") 'face 'font-lock-constant-face)
+                         (propertize (format-mode-line "%m") 'face 'font-lock-type-face)
+                         (when (bound-and-true-p flymake-mode)
+                           (string-trim (format-mode-line flymake-mode-line-counters)))))
+            " ")))
         mini-modeline-l-format nil
         mini-modeline-truncate-p t
         mini-modeline-face-attr nil)
