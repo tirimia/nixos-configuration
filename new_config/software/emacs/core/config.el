@@ -416,29 +416,13 @@
   :config
   (setq consult-buffer-sources '(consult--source-buffer consult-projectile--source-projectile-file consult-projectile--source-projectile-project)))
 
-(use-package mini-modeline
+(use-package mini-echo
   :config
-  (setq mini-modeline-r-format
-        '((:eval
-           (string-join
-            (seq-filter (lambda (item) (and item (not (string-empty-p item))))
-                        (list
-                         (cond (buffer-read-only (propertize "[RO]" 'face 'warning))
-                               ((buffer-modified-p) (propertize "[+]" 'face 'error)))
-                         (propertize (buffer-name) 'face 'font-lock-keyword-face)
-                         (when (and (bound-and-true-p projectile-mode)
-                                    (projectile-project-p)
-                                    (not (string= (projectile-project-name) "-")))
-                           (propertize (format "(%s)" (projectile-project-name)) 'face 'font-lock-comment-face))
-                         (propertize (format-mode-line "%l:%c") 'face 'font-lock-constant-face)
-                         (propertize (format-mode-line "%m") 'face 'font-lock-type-face)
-                         (when (bound-and-true-p flymake-mode)
-                           (string-trim (format-mode-line flymake-mode-line-counters)))))
-            " ")))
-        mini-modeline-l-format nil
-        mini-modeline-truncate-p t
-        mini-modeline-face-attr nil)
-  (mini-modeline-mode t))
+  (setq mini-echo-project-detection 'projectile)
+  (setq mini-echo-persistent-rule
+        '(:both ("flymake" "major-mode" "buffer-position" "project" "buffer-name")))
+  (setq mini-echo-separator " ")
+  (mini-echo-mode 1))
 
 (use-package eglot
   :ensure nil
