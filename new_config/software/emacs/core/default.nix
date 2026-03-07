@@ -1,7 +1,13 @@
 { ... }:
 {
   flake.modules.homeManager.emacs-core =
-    { pkgs, lib, ... }:
+    {
+      pkgs,
+      lib,
+      config,
+      osConfig,
+      ...
+    }:
     {
       programs.emacs = {
         enable = lib.mkDefault true;
@@ -13,8 +19,11 @@
         glibtool
         just
         just-lsp
+        multimarkdown
       ];
       home.file.".config/emacs/init.el".text = lib.mkBefore (builtins.readFile ./config.el);
-      home.file.".config/emacs/templateforge".text = builtins.readFile ./templateforge;
+      home.file.".config/emacs/templateforge".source = config.lib.file.mkOutOfStoreSymlink (
+        osConfig.dotfiles.getSystemPath ./templateforge
+      );
     };
 }
