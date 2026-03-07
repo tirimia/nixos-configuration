@@ -10,6 +10,7 @@
         inputs.self.modules.homeManager.emacs-rust
         inputs.self.modules.homeManager.emacs-elixir
         inputs.self.modules.homeManager.emacs-go
+        inputs.self.modules.homeManager.emacs-ocaml
         inputs.self.modules.homeManager.emacs-yaml
         inputs.self.modules.homeManager.emacs-haskell
         inputs.self.modules.homeManager.emacs-nushell
