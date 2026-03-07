@@ -21,10 +21,10 @@
           inputs.self.modules.homeManager.sre
           inputs.self.modules.homeManager.git
           {
-            programs.git = {
-              userName = "Theodor-Alexandru Irimia";
-              userEmail = "11174371+tirimia@users.noreply.github.com";
-              extraConfig.github.user = "tirimia";
+            programs.git.settings = {
+              user.name = "Theodor-Alexandru Irimia";
+              user.email = "11174371+tirimia@users.noreply.github.com";
+              github.user = "tirimia";
             };
           }
           inputs.self.modules.homeManager.zsh

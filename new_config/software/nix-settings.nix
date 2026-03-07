@@ -15,7 +15,7 @@ let
     {
       environment.systemPackages = with pkgs; [
         nixfmt-tree
-        inputs.nix-linter.legacyPackages.${pkgs.system}.nix-linter
+        inputs.nix-linter.legacyPackages.${pkgs.stdenv.hostPlatform.system}.nix-linter
         nixd
       ];
     };

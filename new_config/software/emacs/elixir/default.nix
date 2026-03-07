@@ -7,7 +7,7 @@
         beamPackages.elixir_1_19
         beamPackages.erlang
         beamPackages.rebar3
-        inputs.expert-lsp.packages.${pkgs.system}.default
+        inputs.expert-lsp.packages.${pkgs.stdenv.hostPlatform.system}.default
         beamPackages.elixir-ls
         gleam
       ];

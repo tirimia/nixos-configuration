@@ -11,7 +11,7 @@
           ".direnv"
           ".envrc"
         ];
-        extraConfig = {
+        settings = {
           core = {
             untrackedcache = true;
             fsmonitor = true;

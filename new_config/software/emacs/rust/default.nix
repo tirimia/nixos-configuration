@@ -4,8 +4,8 @@
     { pkgs, ... }:
     {
       home.packages = [
-        (inputs.fenix.packages.${pkgs.system}.combine [
-          (inputs.fenix.packages.${pkgs.system}.latest.withComponents [
+        (inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}.combine [
+          (inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}.latest.withComponents [
             "cargo"
             "clippy"
             "rustc"
@@ -13,7 +13,7 @@
             "rust-src"
             "rust-analyzer"
           ])
-          inputs.fenix.packages.${pkgs.system}.targets.wasm32-unknown-unknown.latest.rust-std
+          inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}.targets.wasm32-unknown-unknown.latest.rust-std
         ])
         pkgs.openssl.dev
         pkgs.pkg-config
