@@ -8,6 +8,17 @@
 `comment-start`TODO: $0
 ===== fixme
 `comment-start`FIXME: $0
+========== typescript-ts-mode
+===== eftag
+class $1 extends Context.Tag("$1")<$1, {$2}>() {}
+===== efservice
+class $1 extends ServiceMap.Service<$1, { $2 }>()("$1") {}
+===== cyie
+const $1 = yield* $2
+===== efgen
+Effect.gen(function*() { $0 })
+===== eferr
+class $1 extends Data.TaggedError("$1")<$2> {}$0
 ========== typescript-ts-mode tsx-ts-mode
 ===== impf
 import { ${2:exports} } from '${1:lib}';$0
@@ -152,3 +163,5 @@ ${1:Field} ${2:string} \`json:"${1:$(downcase yas-text)}"\`$0
 ========== emacs-lisp-mode
 ===== use-package
 (use-package $1)
+===== letbind
+(let (($1)) $0)

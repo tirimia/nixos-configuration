@@ -8,6 +8,11 @@
     (interactive)
     (setq-local eglot-server-programs
                 '((rustic-mode .
-                               ("rust-analyzer" :initializationOptions (:check (:command "clippy")))))))
+                               ("rust-analyzer"
+                                :initializationOptions (:check
+                                                        (:command "clippy")
+                                                        :cargo
+                                                        ;; Don't annoy me with "feature x" not enabled
+                                                        (:features "all")))))))
   (add-to-list 'evil-emacs-state-modes 'rustic-popup-mode)
   :hook (rustic-mode . tirimia/rust-setup))

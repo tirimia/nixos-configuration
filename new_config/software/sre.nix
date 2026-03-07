@@ -4,6 +4,8 @@
     { pkgs, ... }:
     {
       home.packages = [
+        pkgs.uv # TODO: move to an analysis module
+        pkgs.gh
         pkgs.fd
         pkgs.coreutils
         pkgs.jq

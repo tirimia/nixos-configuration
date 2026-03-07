@@ -26,6 +26,7 @@
   (global-display-line-numbers-mode -1) ;; TODO make weight thin and height 1, also figure out how to shrink the bar
   (electric-pair-mode) ;; autocompletes parens _and_ does the enter and indent how I expect it
   (setq ring-bell-function 'ignore)  ;no ringing bells
+  (setq load-prefer-newer t) ;; Actually load when I make changes to local packages
   (defalias 'yes-or-no-p 'y-or-n-p)
   (setq line-number-mode t)
   (setq column-number-mode t)
@@ -36,6 +37,8 @@
   (setq-default indent-tabs-mode nil
 		            tab-width 2)
   (toggle-frame-maximized)
+  (window-divider-mode t)
+  (setq window-divider-default-places t) ;; All dividers enabled
   (load-theme 'modus-vivendi)
   (add-to-list 'default-frame-alist '(font . "Iosevka Comfy Wide:pixelsize=14:weight=medium:slant=normal:width=normal:spacing=100:scalable=true"))
   (defun make-directory-maybe (orig-fun filename &optional wildcards)
@@ -47,9 +50,6 @@
     (funcall orig-fun filename wildcards))
   (advice-add 'find-file :around #'make-directory-maybe))
 
-(use-package centered-cursor-mode
-  :custom (ccm-recenter-at-end-of-file t)
-  :config (global-centered-cursor-mode))
 (use-package evil
   :init
   (setq evil-want-keybinding nil
@@ -352,6 +352,8 @@
   :config (direnv-mode))
 
 (use-package magit)
+(use-package transient-posframe
+  :config (transient-posframe-mode))
 
 (use-package vterm
   :init (setq-default vterm-always-compile-module t)

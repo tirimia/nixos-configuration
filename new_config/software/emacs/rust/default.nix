@@ -15,6 +15,8 @@
           ])
           inputs.fenix.packages.${pkgs.system}.targets.wasm32-unknown-unknown.latest.rust-std
         ])
+        pkgs.openssl.dev
+        pkgs.pkg-config
       ];
 
       programs.emacs.extraPackages =
