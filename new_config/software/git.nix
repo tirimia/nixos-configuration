@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ ... }:
 {
   flake.modules.homeManager.git =
     { pkgs, lib, ... }:
@@ -10,6 +10,7 @@
           ".idea"
           ".direnv"
           ".envrc"
+          ".DS_Store"
         ];
         settings = {
           core = {

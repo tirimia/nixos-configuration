@@ -469,6 +469,8 @@
   :hook (just-mode . eglot-ensure)
   :config (add-to-list 'eglot-server-programs '(just-mode . ("just-lsp"))))
 
+(use-package restclient)
+
 ;; Org
 (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 (add-hook 'doc-view-mode-hook 'auto-revert-mode) ;; Keep pdf view updated

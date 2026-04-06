@@ -5,6 +5,8 @@
     {
       home.packages = [
         pkgs.uv # TODO: move to an analysis module
+        pkgs.cue
+        pkgs.jsonnet
         pkgs.gh
         pkgs.fd
         pkgs.coreutils
