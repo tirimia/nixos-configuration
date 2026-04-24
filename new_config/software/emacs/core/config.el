@@ -16,39 +16,64 @@
 			use-package-expand-minimally t)))
 (setq use-package-always-ensure t)
 
+(defun tirimia/setup-ui-frame ()
+  "Set UI and frame defaults."
+  (setq inhibit-startup-message t)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (global-display-line-numbers-mode -1)
+  (window-divider-mode t)
+  (setq window-divider-default-places t)
+  (load-theme 'modus-vivendi)
+  (toggle-frame-maximized)
+  (add-to-list 'default-frame-alist
+               '(font . "Iosevka Comfy Wide:pixelsize=14:weight=medium:slant=normal:width=normal:spacing=100:scalable=true")))
+
+(defun tirimia/setup-editing-behavior ()
+  "Set baseline editing defaults."
+  (setq ring-bell-function 'ignore
+        load-prefer-newer t
+        line-number-mode t
+        column-number-mode t
+        make-backup-files nil
+        auto-save-default nil
+        custom-file (make-temp-name "/tmp/")
+        initial-scratch-message nil)
+  (setq-default indent-tabs-mode nil
+                tab-width 2)
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  (electric-pair-mode))
+
+(defun tirimia/delete-trailing-whitespace-on-save ()
+  "Delete trailing whitespace before saving file-backed buffers."
+  (when buffer-file-name
+    (delete-trailing-whitespace)))
+
+(defun tirimia/setup-save-hooks ()
+  "Register save-time cleanup hooks."
+  (add-hook 'before-save-hook #'tirimia/delete-trailing-whitespace-on-save))
+
+(defun tirimia/make-directory-maybe (orig-fun filename &optional wildcards)
+  "Create parent directory if not exists before visiting file."
+  (unless (file-exists-p filename)
+    (let ((dir (file-name-directory filename)))
+      (unless (file-exists-p dir)
+        (make-directory dir t))))
+  (funcall orig-fun filename wildcards))
+
+(defun tirimia/setup-find-file-advice ()
+  "Create parent directories before opening non-existent files."
+  (advice-add 'find-file :around #'tirimia/make-directory-maybe))
+
+;; Generic startup bootstrap entrypoint.
 (use-package emacs
   :ensure nil
   :init
-  (setq inhibit-startup-message t)   ;no startup screen
-  (tool-bar-mode -1)                 ;no toolbar
-  (menu-bar-mode -1)                 ;no menubar
-  (scroll-bar-mode -1)               ;no scrollbar
-  (global-display-line-numbers-mode -1) ;; TODO make weight thin and height 1, also figure out how to shrink the bar
-  (electric-pair-mode) ;; autocompletes parens _and_ does the enter and indent how I expect it
-  (setq ring-bell-function 'ignore)  ;no ringing bells
-  (setq load-prefer-newer t) ;; Actually load when I make changes to local packages
-  (defalias 'yes-or-no-p 'y-or-n-p)
-  (setq line-number-mode t)
-  (setq column-number-mode t)
-  (setq make-backup-files nil)
-  (setq auto-save-default nil)
-  (setq custom-file (make-temp-name "/tmp/"))
-  (setq initial-scratch-message nil)
-  (setq-default indent-tabs-mode nil
-		            tab-width 2)
-  (toggle-frame-maximized)
-  (window-divider-mode t)
-  (setq window-divider-default-places t) ;; All dividers enabled
-  (load-theme 'modus-vivendi)
-  (add-to-list 'default-frame-alist '(font . "Iosevka Comfy Wide:pixelsize=14:weight=medium:slant=normal:width=normal:spacing=100:scalable=true"))
-  (defun make-directory-maybe (orig-fun filename &optional wildcards)
-    "Create parent directory if not exists before visiting file."
-    (unless (file-exists-p filename)
-      (let ((dir (file-name-directory filename)))
-        (unless (file-exists-p dir)
-          (make-directory dir t))))
-    (funcall orig-fun filename wildcards))
-  (advice-add 'find-file :around #'make-directory-maybe))
+  (tirimia/setup-ui-frame)
+  (tirimia/setup-editing-behavior)
+  (tirimia/setup-save-hooks)
+  (tirimia/setup-find-file-advice))
 
 (use-package evil
   :init

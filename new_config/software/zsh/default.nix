@@ -73,7 +73,11 @@
           zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
           eval "$(direnv hook zsh)"
           export CLICOLOR=1 # pretty colors
+
+          # Funny rust business
           export PATH=~/.local/bin:~/.cargo/bin:$PATH
+          export PKG_CONFIG_PATH=${pkgs.openssl.dev}/lib/pkgconfig # MANDATORY SO LIBSSL RUST SHIT COMPILES
+          export OPENSSL_STATIC="0";
 
           source ~/.config/zsh/powerlevel10k.zsh
         '';

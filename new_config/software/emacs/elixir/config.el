@@ -9,7 +9,7 @@
   (defun tirimia/elixir-setup ()
     "Liquid gold."
     (interactive)
-    (setq-local eglot-server-programs '((elixir-mode "elixir-ls")))
+    (setq-local eglot-server-programs '((elixir-mode . ("expert" "--stdio"))))
     (eglot-ensure))
   :hook
   (elixir-ts-mode . tirimia/elixir-setup)

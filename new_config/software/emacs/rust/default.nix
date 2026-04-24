@@ -17,6 +17,7 @@
         ])
         pkgs.openssl.dev
         pkgs.pkg-config
+        pkgs.perl
       ];
 
       programs.emacs.extraPackages =
