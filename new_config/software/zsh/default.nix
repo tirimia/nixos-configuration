@@ -80,6 +80,7 @@
           export OPENSSL_STATIC="0";
 
           source ~/.config/zsh/powerlevel10k.zsh
+          source ~/.ghcup/env
         '';
         plugins = [
           {

@@ -3,14 +3,14 @@
   flake.modules.homeManager.emacs-haskell =
     { pkgs, ... }:
     {
-      home.packages = with pkgs; [
-        haskell-language-server
-        cabal-install
-        stack
-        ghc
-        fourmolu
-        hlint
-      ];
+      # home.packages = with pkgs; [
+      #   haskell-language-server
+      #   cabal-install
+      #   stack
+      #   ghc
+      #   fourmolu
+      #   hlint
+      # ];
       home.file.".config/ghc/ghci.conf".text = ''
         :set prompt "\x03BB> "
         :set prompt-cont " > "

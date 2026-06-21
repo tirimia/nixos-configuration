@@ -75,6 +75,10 @@
   (tirimia/setup-save-hooks)
   (tirimia/setup-find-file-advice))
 
+(use-package exec-path-from-shell
+  :config (when (memq window-system '(mac ns x))
+            (exec-path-from-shell-initialize)))
+
 (use-package evil
   :init
   (setq evil-want-keybinding nil
@@ -130,7 +134,8 @@
 (use-package ace-window
   :config (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :bind
-  ("M-o" . ace-window))
+  (("M-o" . ace-window)
+   ("M-O" . ace-swap-window)))
 
 (use-package flick
   :vc (:url "https://github.com/tirimia/flick" :rev :newest)
@@ -256,10 +261,16 @@
   :load-path "~/Personal/templateforge/"
   :config (templateforge-mode 1))
 
+(use-package tarot-mode
+  :load-path "~/Personal/tarot-mode")
+
 (use-package cape
   :after yasnippet-capf
+  :init (require 'dabbrev)
   :config
-  (setq dabbrev-case-fold-search t)
+  (setq dabbrev-case-fold-search t
+        ;; Make it so dabbrev doesn't stop on . or (, allowing for completing more involved strings
+        dabbrev-abbrev-char-regexp "[^[:space:]\n]")
   (defvar tirimia/base-capfs (list #'yasnippet-capf #'cape-dabbrev)
     "Base completion backends shared across all modes.")
   (defun tirimia/setup-base-completion ()
@@ -269,11 +280,13 @@
                       #'cape-file)))
   (defun tirimia/setup-eglot-completion ()
     "Eglot completion: merge LSP with base backends, then file."
-    (setq-local completion-at-point-functions
-                (list (apply #'cape-capf-super
-                             (cape-capf-properties #'eglot-completion-at-point :exclusive 'no)
-                             tirimia/base-capfs)
-                      #'cape-file)))
+    (if eglot--managed-mode
+        (setq-local completion-at-point-functions
+                    (list (apply #'cape-capf-super
+                                 (cape-capf-properties #'eglot-completion-at-point :exclusive 'no)
+                                 tirimia/base-capfs)
+                          #'cape-file))
+      (tirimia/setup-base-completion)))
   (defun tirimia/setup-elisp-completion ()
     "Elisp completion: merge elisp + base backends, then file."
     (setq-local completion-at-point-functions
@@ -283,8 +296,7 @@
                       #'cape-file)))
   (add-hook 'prog-mode-hook #'tirimia/setup-base-completion)
   (add-hook 'text-mode-hook #'tirimia/setup-base-completion)
-  (add-hook 'emacs-lisp-mode-hook #'tirimia/setup-elisp-completion)
-  (add-hook 'eglot-managed-mode-hook #'tirimia/setup-eglot-completion))
+  (add-hook 'emacs-lisp-mode-hook #'tirimia/setup-elisp-completion))
 (use-package corfu
   :init
   (global-corfu-mode)
@@ -453,6 +465,7 @@
 
 (use-package eglot
   :ensure nil
+  :after cape
   :bind (:map eglot-mode-map
 	            ("s-l a" . eglot-code-actions)
 	            ("s-l r" . eglot-rename)
@@ -470,6 +483,7 @@
   (defun tirimia/eglot-setup-format-on-save ()
     "Add format-on-save hook for eglot-managed buffers."
     (add-hook 'before-save-hook #'tirimia/eglot-format-buffer-on-save t t))
+  (add-hook 'eglot-managed-mode-hook #'tirimia/setup-eglot-completion 100)
   (add-hook 'eglot-managed-mode-hook #'tirimia/eglot-setup-format-on-save))
 
 (use-package eglot-codelens
@@ -499,8 +513,8 @@
 ;; Org
 (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 (add-hook 'doc-view-mode-hook 'auto-revert-mode) ;; Keep pdf view updated
-(setq org-latex-pdf-process '("%latex -interaction nonstopmode -output-directory %o %f" "%latex -interaction nonstopmode -output-directory %o %f" "%latex -interaction nonstopmode -output-directory %o %f"))
-;; ("tectonic -Z shell-escape --outdir=%o %f")
+(setq org-latex-pdf-process ;'("%latex -interaction nonstopmode -output-directory %o %f" "%latex -interaction nonstopmode -output-directory %o %f" "%latex -interaction nonstopmode -output-directory %o %f"))
+      '("tectonic -Z shell-escape --outdir=%o %f"))
 (setq org-export-dispatch-use-expert-ui t) ;; Get menu in minibuffer, don't show entire thing
 (setq-default org-directory "~/MEGA/Org"
               org-startup-folded t

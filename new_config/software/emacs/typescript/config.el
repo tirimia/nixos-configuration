@@ -13,8 +13,6 @@
                       :initializationOptions
                       (:preferences
                        (
-                        :includeInlayParameterNameHints "literals"
-                        :includeInlayFunctionParameterTypeHints t
                         :includeInlayVariableTypeHints :json-false
                         ))))))
     (eglot-ensure))
