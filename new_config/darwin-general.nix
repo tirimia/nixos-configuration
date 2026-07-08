@@ -12,6 +12,27 @@
       system.defaults.dock.autohide = true;
       nix.enable = false; # https://determinate.systems/posts/nix-darwin-updates/
       nix.channel.enable = false;
+      environment.etc."nix/registry.json".text = builtins.toJSON {
+        version = 2;
+        flakes = [
+          {
+            from = {
+              type = "indirect";
+              id = "nixpkgs";
+            };
+            to = {
+              type = "path";
+              path = inputs.nixpkgs.outPath;
+              # narHash pins it so `nix flake metadata nixpkgs` doesn't need to reverify
+              narHash = inputs.nixpkgs.narHash;
+            };
+          }
+        ];
+      };
+      nix.nixPath = [ "nixpkgs=flake:nixpkgs" ];
+      environment.etc."nix/nix.custom.conf".text = ''
+        nix-path = nixpkgs=flake:nixpkgs
+      '';
       fonts.packages = with pkgs; [
         iosevka-comfy.comfy-wide
         intel-one-mono
