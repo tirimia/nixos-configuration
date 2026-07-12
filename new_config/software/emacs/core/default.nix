@@ -14,6 +14,7 @@
         package = lib.mkDefault pkgs.emacs30-pgtk;
       };
       home.packages = with pkgs; [
+        rassumfrassum # LSP multiplexer
         eask-cli
         ripgrep
         cmake

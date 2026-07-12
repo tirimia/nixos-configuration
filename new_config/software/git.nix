@@ -3,7 +3,7 @@
   flake.modules.homeManager.git =
     { pkgs, lib, ... }:
     {
-      home.packages = [pkgs.jujutsu];
+      home.packages = [ pkgs.jujutsu ];
       home.file.".config/jj/config.toml".text = ''
         [user]
         name = "Theodor-Alexandru Irimia"
@@ -46,7 +46,7 @@
           };
         };
       };
-      home.file."work/.gitconfig".text = ''
+      home.file."git/github.com/trivago/.gitconfig".text = ''
         [url "ssh://git@github.com/"]
             insteadOf = https://github.com/
       '';

@@ -1,3 +1,8 @@
+========== org-mode
+===== src
+#+BEGIN_SRC $1
+$2
+#+END_SRC
 ========== text-mode
 ===== today
 `(format-time-string "%Y-%m-%d")`$0
@@ -9,11 +14,20 @@
 ===== fixme
 `comment-start`FIXME: $0
 ========== typescript-ts-mode
+===== jsdoc
+/**
+ * $1
+ */
 ===== eftag
 class $1 extends Context.Tag("$1")<$1, {
   $0
 }>() {}
 ===== efservice
+class $1 extends Effect.Service<$1>()("$1", {
+  effect: $2,
+  dependencies: []
+}) { }
+===== efservice4
 class $1 extends ServiceMap.Service<$1, {
   $0
 }>()("$1") {}

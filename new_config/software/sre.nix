@@ -13,6 +13,7 @@
         pkgs.coreutils
         pkgs.jq
         pkgs.yq
+        pkgs.kubernetes-helm
         pkgs.kubectl
         pkgs.kubectx
         pkgs.kubie

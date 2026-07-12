@@ -1,3 +1,17 @@
+/*
+  def main [repo_url: string] {
+    let parts = $repo_url | parse --regex 'git@(.*):(.*)\/(.*).git'
+    let host: string = $parts.0 | get 'capture0'
+    let org: string = $parts.0 | get 'capture1'
+    let repo: string = $parts.0 | get 'capture2'
+
+    let target: string = $"($env.HOME)/git/($host)/($org)"
+    mkdir $target
+    cd $target
+    git clone $repo_url
+    cd $repo
+  }
+*/
 {
   pkgs,
   config,
@@ -8,7 +22,7 @@
   options = {
   };
   config = {
-    programs.zsh.promptInit = '''';
+    programs.zsh.promptInit = "";
     programs.zsh.enableGlobalCompInit = false;
     programs.zsh.enableBashCompletion = false;
     home-manager.users.${config.target.user} = {

@@ -7,7 +7,7 @@
         bun
         typescript-language-server
         typescript
-        nodePackages.prettier
+        prettier
         eslint_d
       ];
 

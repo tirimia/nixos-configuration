@@ -28,7 +28,7 @@
   (load-theme 'modus-vivendi)
   (toggle-frame-maximized)
   (add-to-list 'default-frame-alist
-               '(font . "Iosevka Comfy Wide:pixelsize=14:weight=medium:slant=normal:width=normal:spacing=100:scalable=true")))
+               '(font . "Source Code Pro:pixelsize=16:weight=regular:slant=normal:width=normal:spacing=100:scalable=true")))
 
 (defun tirimia/setup-editing-behavior ()
   "Set baseline editing defaults."
@@ -99,11 +99,6 @@
   (add-to-list 'evil-emacs-state-modes 'special-mode))
 (use-package evil-multiedit
   :config (evil-multiedit-default-keybinds))
-(use-package evil-snipe
-  :config
-  (evil-snipe-mode 1)
-  (evil-snipe-override-mode 1)
-  (setq evil-snipe-spillover-scope 'whole-visible))
 (use-package evil-surround
   :config
   (setq-default evil-surround-pairs-alist '((?\( "(" . ")")
@@ -113,7 +108,7 @@
                                             (?\< "<" . ">")
                                             (?t . evil-surround-read-tag)
                                             (?f . evil-surround-function))
-                                            )
+                )
   (global-evil-surround-mode 1))
 (use-package evil-exchange
   :config
@@ -130,6 +125,22 @@
   (define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.inner")))
 (use-package evil-matchit
   :config (global-evil-matchit-mode))
+(use-package flash
+  :commands (flash-jump flash-jump-continue
+                        flash-treesitter)
+  :custom
+  (flash-multi-window t)
+  ;; (flash-autojump t)
+  (flash-rainbow t)
+  :init
+  ;; Evil integration (simple setup)
+  (require 'flash-evil)
+  (flash-evil-setup t)
+  (setq flash-char-jump-labels t)
+  :config
+  ;; Search integration (labels during C-s, /, ?)
+  (require 'flash-isearch)
+  (flash-isearch-mode 1))
 
 (use-package ace-window
   :config (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
@@ -188,6 +199,8 @@
 (use-package eldoc-box
   :bind
   (:map evil-normal-state-map
+	("K" . eldoc-box-help-at-point)
+	:map evil-visual-state-map
 	("K" . eldoc-box-help-at-point))
   :config
   (add-hook 'eldoc-box-buffer-setup-hook #'eldoc-box-prettify-ts-errors 0 t))
@@ -257,12 +270,11 @@
   :after yasnippet)
 
 (use-package templateforge
-  :vc t
-  :load-path "~/Personal/templateforge/"
+  :vc (:url "https://github.com/tirimia/templateforge" :rev :newest)
   :config (templateforge-mode 1))
 
-(use-package tarot-mode
-  :load-path "~/Personal/tarot-mode")
+;;(use-package tarot-mode
+;;  :load-path "~/Personal/tarot-mode")
 
 (use-package cape
   :after yasnippet-capf
@@ -317,7 +329,6 @@
 	corfu-preview-current 'insert
 	completion-ignore-case t))
 
-(use-package recompile-on-save)
 (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
 (evil-define-key 'motion compilation-mode-map "r" #'recompile)
 
@@ -346,7 +357,8 @@
   (general-def :states '(motion) "SPC" nil)
   (tirimia/leader-def
     "SPC" '(consult-buffer :wk "Switch")
-    "'" (list (lambda () (interactive) (vterm t)) :which-key "Shell")
+    ;;"'" (list (lambda () (interactive) (vterm t)) :which-key "Shell")
+    "'" (list (lambda () (interactive) (ghostel t)) :which-key "Shell")
     "/" '(consult-ripgrep :wk "Project search")
     "c" '(kill-buffer-and-window :wk "Close")
     "f" '(find-file :wk "Find file")
@@ -392,16 +404,18 @@
 (use-package transient-posframe
   :config (transient-posframe-mode))
 
-(use-package vterm
-  :init (setq-default vterm-always-compile-module t)
-  :general (:keymaps 'vterm-mode-map
-                     "C-c C-d" `((lambda () (interactive) (vterm-send "C-d")) :which-key "C-d"))
-  :config
-  (add-to-list 'evil-insert-state-modes 'vterm-mode)
-  (defun tirimia/vterm-startup ()
-    (hl-line-mode -1)
-    (display-line-numbers-mode -1))
-  :hook (vterm-mode . tirimia/vterm-startup))
+;; (use-package vterm
+;;   :init (setq-default vterm-always-compile-module t)
+;;   :general (:keymaps 'vterm-mode-map
+;;                      "C-c C-d" `((lambda () (interactive) (vterm-send "C-d")) :which-key "C-d"))
+;;   :config
+;;   (add-to-list 'evil-insert-state-modes 'vterm-mode)
+;;   (defun tirimia/vterm-startup ()
+;;     (hl-line-mode -1)
+;;     (display-line-numbers-mode -1))
+;;   :hook (vterm-mode . tirimia/vterm-startup))
+(use-package ghostel
+  :config (add-to-list 'evil-insert-state-modes 'ghostel-mode))
 
 (use-package savehist
   :config
@@ -452,8 +466,9 @@
         xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref))
 (use-package consult-projectile
+  :after consult
   :config
-  (setq consult-buffer-sources '(consult--source-buffer consult-projectile--source-projectile-file consult-projectile--source-projectile-project)))
+  (setq consult-buffer-sources '(consult-source-buffer consult-projectile--source-projectile-file consult-projectile--source-projectile-project)))
 
 (use-package mini-echo
   :config
