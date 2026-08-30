@@ -4,26 +4,22 @@
     { pkgs, ... }:
     {
       home.packages = [
-        (inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}.combine [
-          (inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}.latest.withComponents [
-            "cargo"
-            "clippy"
-            "rustc"
-            "rustfmt"
-            "rust-src"
-            "rust-analyzer"
-          ])
-          inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}.targets.wasm32-unknown-unknown.latest.rust-std
-        ])
+        # (inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}.combine [
+        #   (inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}.latest.withComponents [
+        #     "cargo"
+        #     "clippy"
+        #     "rustc"
+        #     "rustfmt"
+        #     "rust-src"
+        #     "rust-analyzer"
+        #   ])
+        #   inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}.targets.wasm32-unknown-unknown.latest.rust-std
+        # ])
+        pkgs.rustup
         pkgs.openssl.dev
         pkgs.pkg-config
         pkgs.perl
       ];
-
-      programs.emacs.extraPackages =
-        epkgs: with epkgs; [
-          rustic
-        ];
 
       home.file.".config/emacs/init.el".text = builtins.readFile ./config.el;
     };

@@ -6,9 +6,11 @@
       home.packages = with pkgs; [
         bun
         typescript-language-server
-        typescript
+        typescript-go
         prettier
         eslint_d
+        oxlint
+        oxfmt
       ];
 
       home.file.".config/emacs/init.el".text = builtins.readFile ./config.el;

@@ -14,10 +14,21 @@ $2
 ===== fixme
 `comment-start`FIXME: $0
 ========== typescript-ts-mode
+===== stare
+static readonly $1 = $0
 ===== jsdoc
 /**
  * $1
  */
+===== efcser
+class $1 extends Context.Service<$1>()("$1", {
+  make: Effect.gen(function*() {
+    $2
+  }),
+}) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+  )
+}
 ===== eftag
 class $1 extends Context.Tag("$1")<$1, {
   $0
@@ -190,6 +201,25 @@ ${1:Field} ${2:string} \`json:"${1:$(downcase yas-text)}"\`$0
 ===== letbind
 (let (($1)) $0)
 ========== nix-ts-mode
+===== flake
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    utils.url = "github:numtide/flake-utils";
+  };
+  outputs = { nixpkgs, utils, ... }: utils.lib.eachDefaultSystem (system:
+  let
+    pkgs = nixpkgs.legacyPackages.${system};
+  in
+  {
+    devShells.default = pkgs.mkShell {
+      buildInputs = with pkgs; [
+        $0
+      ];
+    };
+  }
+  );
+}
 ===== flpart
 { inputs, ... }:
 {
@@ -201,3 +231,6 @@ ${1:Field} ${2:string} \`json:"${1:$(downcase yas-text)}"\`$0
 }
 ===== lst
 [$0];
+========== rustic-mode
+===== der
+#[derive($0)]

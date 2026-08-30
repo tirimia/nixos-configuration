@@ -17,6 +17,7 @@
           ".direnv"
           ".envrc"
           ".DS_Store"
+          ".dir-locals.el"
         ];
         settings = {
           core = {

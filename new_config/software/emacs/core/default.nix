@@ -25,6 +25,7 @@
         # PDF utils
         tectonic
         ghostscript
+        tree-sitter # TODO: this was added for neovim
       ];
       home.file.".config/emacs/init.el".text = lib.mkBefore (builtins.readFile ./config.el);
       home.file.".config/emacs/templateforge".source = config.lib.file.mkOutOfStoreSymlink (

@@ -2,6 +2,7 @@
 
 (setq package-archives '(("org" . "https://orgmode.org/elpa/")
                          ("melpa" . "https://melpa.org/packages/")
+                         ("melpa-stable" . "https://stable.melpa.org/packages/")
                          ("gnu" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 
@@ -357,8 +358,8 @@
   (general-def :states '(motion) "SPC" nil)
   (tirimia/leader-def
     "SPC" '(consult-buffer :wk "Switch")
-    ;;"'" (list (lambda () (interactive) (vterm t)) :which-key "Shell")
-    "'" (list (lambda () (interactive) (ghostel t)) :which-key "Shell")
+    "'" (list (lambda () (interactive) (vterm t)) :which-key "Shell")
+    ;; "'" (list (lambda () (interactive) (ghostel t)) :which-key "Shell")
     "/" '(consult-ripgrep :wk "Project search")
     "c" '(kill-buffer-and-window :wk "Close")
     "f" '(find-file :wk "Find file")
@@ -404,18 +405,18 @@
 (use-package transient-posframe
   :config (transient-posframe-mode))
 
-;; (use-package vterm
-;;   :init (setq-default vterm-always-compile-module t)
-;;   :general (:keymaps 'vterm-mode-map
-;;                      "C-c C-d" `((lambda () (interactive) (vterm-send "C-d")) :which-key "C-d"))
-;;   :config
-;;   (add-to-list 'evil-insert-state-modes 'vterm-mode)
-;;   (defun tirimia/vterm-startup ()
-;;     (hl-line-mode -1)
-;;     (display-line-numbers-mode -1))
-;;   :hook (vterm-mode . tirimia/vterm-startup))
-(use-package ghostel
-  :config (add-to-list 'evil-insert-state-modes 'ghostel-mode))
+(use-package vterm
+  :init (setq-default vterm-always-compile-module t)
+  :general (:keymaps 'vterm-mode-map
+                     "C-c C-d" `((lambda () (interactive) (vterm-send "C-d")) :which-key "C-d"))
+  :config
+  (add-to-list 'evil-insert-state-modes 'vterm-mode)
+  (defun tirimia/vterm-startup ()
+    (hl-line-mode -1)
+    (display-line-numbers-mode -1))
+  :hook (vterm-mode . tirimia/vterm-startup))
+;; (use-package ghostel
+;;   :config (add-to-list 'evil-insert-state-modes 'ghostel-mode))
 
 (use-package savehist
   :config
@@ -455,7 +456,7 @@
                    '("/nix/store/" "~/.cargo/registry"))))
   :config
   (projectile-mode))
-
+(setq project-vc-extra-root-markers '("package.json"))
 (use-package consult
   :bind
   (("M-g M-g" . consult-goto-line)
