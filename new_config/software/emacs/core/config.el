@@ -26,6 +26,7 @@
   (global-display-line-numbers-mode -1)
   (window-divider-mode t)
   (setq window-divider-default-places t)
+  (pixel-scroll-precision-mode 1)
   (load-theme 'modus-vivendi)
   (toggle-frame-maximized)
   (add-to-list 'default-frame-alist
@@ -281,9 +282,7 @@
   :after yasnippet-capf
   :init (require 'dabbrev)
   :config
-  (setq dabbrev-case-fold-search t
-        ;; Make it so dabbrev doesn't stop on . or (, allowing for completing more involved strings
-        dabbrev-abbrev-char-regexp "[^[:space:]\n]")
+  (setq dabbrev-case-fold-search t)
   (defvar tirimia/base-capfs (list #'yasnippet-capf #'cape-dabbrev)
     "Base completion backends shared across all modes.")
   (defun tirimia/setup-base-completion ()
@@ -401,7 +400,8 @@
 (use-package direnv
   :config (direnv-mode))
 
-(use-package magit)
+(use-package magit
+  :config (setq magit-status-show-untracked-files 'all))
 (use-package transient-posframe
   :config (transient-posframe-mode))
 
