@@ -2,6 +2,12 @@
 {
   flake.modules.homeManager.zsh =
     { pkgs, config, ... }:
+    let
+      klon = pkgs.writeScriptBin "klon" ''
+        #!${pkgs.nushell}/bin/nu
+        ${builtins.readFile ./klon.nu}
+      '';
+    in
     {
       programs.zsh = {
         enable = true;
@@ -69,6 +75,11 @@
           nix-sha() {
               nix hash to-sri --type sha256 $(nix-prefetch-url $1)
           }
+          klon() {
+              local dest
+              dest="$(command klon "$@")" || return
+              cd "$dest"
+          }
 
           zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
           eval "$(direnv hook zsh)"
@@ -131,7 +142,10 @@
         enableZshIntegration = true;
       };
       home = {
-        packages = [ pkgs.zsh-powerlevel10k ];
+        packages = [
+          pkgs.zsh-powerlevel10k
+          klon
+        ];
         file.".config/zsh/powerlevel10k.zsh".source = ./powerlevel10k.zsh;
       };
     };
