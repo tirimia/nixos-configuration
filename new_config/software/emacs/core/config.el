@@ -81,6 +81,11 @@
   :config (when (memq window-system '(mac ns x))
             (exec-path-from-shell-initialize)))
 
+(use-package zoom
+  :config
+  (setq zoom-size '(0.618 . 0.618))
+  (zoom-mode 1))
+
 (use-package evil
   :init
   (setq evil-want-keybinding nil

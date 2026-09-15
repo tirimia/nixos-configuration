@@ -209,7 +209,7 @@ ${1:Field} ${2:string} \`json:"${1:$(downcase yas-text)}"\`$0
   };
   outputs = { nixpkgs, utils, ... }: utils.lib.eachDefaultSystem (system:
   let
-    pkgs = nixpkgs.legacyPackages.${system};
+    pkgs = nixpkgs.legacyPackages.\${system};
   in
   {
     devShells.default = pkgs.mkShell {
