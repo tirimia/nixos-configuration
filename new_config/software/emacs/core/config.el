@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (setq gc-cons-threshold (* 50 1024 1024))
 
 (setq package-archives '(("org" . "https://orgmode.org/elpa/")
@@ -68,6 +69,11 @@
   "Create parent directories before opening non-existent files."
   (advice-add 'find-file :around #'tirimia/make-directory-maybe))
 
+(defun tirimia/setup-treesitter ()
+  "Treesitter configuration"
+  (setq treesit-auto-install-grammar 'always)
+  (setq treesit-enabled-modes t))
+
 ;; Generic startup bootstrap entrypoint.
 (use-package emacs
   :ensure nil
@@ -75,7 +81,8 @@
   (tirimia/setup-ui-frame)
   (tirimia/setup-editing-behavior)
   (tirimia/setup-save-hooks)
-  (tirimia/setup-find-file-advice))
+  (tirimia/setup-find-file-advice)
+  (tirimia/setup-treesitter))
 
 (use-package exec-path-from-shell
   :config (when (memq window-system '(mac ns x))
@@ -201,7 +208,9 @@
   :hook prog-mode
   :config
   (add-hook 'flymake-mode-hook #'tirimia/disable-flymake-eldoc)
-  (setq flymake-show-diagnostics-at-end-of-line nil))
+  (setq flymake-show-diagnostics-at-end-of-line nil)
+  ;; Allows flymake to do its magic
+  (setq trusted-content '("~/git/")))
 
 (use-package eldoc-box
   :bind
@@ -737,3 +746,5 @@ With this added :around, it goes to capture the respective daily note"
        (org-roam-dailies--capture
         (encode-time (list 0 0 0 day month year)))))))
 (add-hook 'org-mode-hook 'auto-fill-mode)
+
+(server-start)

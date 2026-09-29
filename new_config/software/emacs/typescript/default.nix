@@ -6,7 +6,7 @@
       home.packages = with pkgs; [
         bun
         typescript-language-server
-        typescript-go
+        typescript
         prettier
         eslint_d
         oxlint

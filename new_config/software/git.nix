@@ -42,7 +42,7 @@
           status = {
             showUntrackedFiles = "all";
           };
-          credential = lib.optionalAttrs pkgs.stdenv.isDarwin {
+          credential = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
             helper = "osxkeychain";
           };
         };

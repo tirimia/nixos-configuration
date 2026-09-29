@@ -14,6 +14,25 @@ $2
 ===== fixme
 `comment-start`FIXME: $0
 ========== typescript-ts-mode
+===== 2darrfunc
+function createGrid(rows: number, cols: number, fill = 0): number[][] {
+  return Array.from({ length: rows }, () => Array(cols).fill(fill));
+}
+===== bun test setup
+import { describe, expect, test } from 'bun:test';
+
+describe('$1', () => {
+  test('$2', () => {
+    expect(1).toBe(1)$0
+  })
+})
+===== tdesc
+describe('$1', () => {
+})
+===== ttest
+test('$2', () => {
+  expect(1).toBe(1)$0
+})
 ===== stare
 static readonly $1 = $0
 ===== jsdoc
@@ -193,6 +212,12 @@ ctx context.Context$0
 func ${1:handler}(w http.ResponseWriter, r *http.Request) {
 	$0
 }
+===== wait for signal
+ctx, stop := signal.NotifyContext(
+    context.Background(), syscall.SIGINT, syscall.SIGTERM)
+defer stop()
+
+<-ctx.Done()
 ===== jsm
 ${1:Field} ${2:string} \`json:"${1:$(downcase yas-text)}"\`$0
 ========== emacs-lisp-mode

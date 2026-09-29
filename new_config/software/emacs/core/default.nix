@@ -11,7 +11,7 @@
     {
       programs.emacs = {
         enable = lib.mkDefault true;
-        package = lib.mkDefault pkgs.emacs30-pgtk;
+        package = lib.mkDefault pkgs.emacs-pgtk;
       };
       home.packages = with pkgs; [
         rassumfrassum # LSP multiplexer

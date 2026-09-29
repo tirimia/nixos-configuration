@@ -5,7 +5,7 @@
     {
       imports = [
         inputs.self.modules.homeManager.emacs-core
-        inputs.self.modules.homeManager.emacs-tree-sitter-grammars
+        # inputs.self.modules.homeManager.emacs-tree-sitter-grammars # Cuda language wouldn't compile, trying to let emacs do it
         inputs.self.modules.homeManager.emacs-typescript
         inputs.self.modules.homeManager.emacs-rust
         inputs.self.modules.homeManager.emacs-elixir

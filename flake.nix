@@ -4,8 +4,6 @@
     inputs@{ flake-parts, import-tree, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
-        # Enable flake-parts modules support for dendritic pattern
-        inputs.flake-parts.flakeModules.modules
         # Import dendritic configuration tree
         (import-tree ./new_config)
       ];

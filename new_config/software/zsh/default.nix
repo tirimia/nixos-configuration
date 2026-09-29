@@ -25,6 +25,7 @@
           gap = "git add -p";
           gcm = "git commit -m";
           ll = "ls -lathrs";
+          e = "emacsclient -n";
         };
         initContent = ''
           if [[ -r "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh" ]]; then
