@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: H sigil
-# key: h
-# --
-~H"""
-$0
-"""

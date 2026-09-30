@@ -1,31 +1,14 @@
-/*
-  def main [repo_url: string] {
-    let parts = $repo_url | parse --regex 'git@(.*):(.*)\/(.*).git'
-    let host: string = $parts.0 | get 'capture0'
-    let org: string = $parts.0 | get 'capture1'
-    let repo: string = $parts.0 | get 'capture2'
-
-    let target: string = $"($env.HOME)/git/($host)/($org)"
-    mkdir $target
-    cd $target
-    git clone $repo_url
-    cd $repo
-  }
-*/
+{ inputs, ... }:
 {
-  pkgs,
-  config,
-  ...
-}:
-{
-  imports = [ ];
-  options = {
-  };
-  config = {
-    programs.zsh.promptInit = "";
-    programs.zsh.enableGlobalCompInit = false;
-    programs.zsh.enableBashCompletion = false;
-    home-manager.users.${config.target.user} = {
+  flake.modules.homeManager.zsh =
+    { pkgs, config, ... }:
+    let
+      klon = pkgs.writeScriptBin "klon" ''
+        #!${pkgs.nushell}/bin/nu
+        ${builtins.readFile ./klon.nu}
+      '';
+    in
+    {
       programs.zsh = {
         enable = true;
         enableCompletion = true;
@@ -35,13 +18,14 @@
           save = 1000000;
           size = 1000000;
         };
-        dotDir = ".config/zsh";
+        dotDir = "${config.xdg.configHome}/zsh";
         shellAliases = {
           cdr = "cd `git rev-parse --show-toplevel`";
           gs = "git status";
           gap = "git add -p";
           gcm = "git commit -m";
           ll = "ls -lathrs";
+          e = "emacsclient -n";
         };
         initContent = ''
           if [[ -r "$XDG_CACHE_HOME/p10k-instant-prompt-*.zsh" ]]; then
@@ -92,12 +76,23 @@
           nix-sha() {
               nix hash to-sri --type sha256 $(nix-prefetch-url $1)
           }
+          klon() {
+              local dest
+              dest="$(command klon "$@")" || return
+              cd "$dest"
+          }
 
           zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
           eval "$(direnv hook zsh)"
           export CLICOLOR=1 # pretty colors
 
+          # Funny rust business
+          export PATH=~/.local/bin:~/.cargo/bin:$PATH
+          export PKG_CONFIG_PATH=${pkgs.openssl.dev}/lib/pkgconfig # MANDATORY SO LIBSSL RUST SHIT COMPILES
+          export OPENSSL_STATIC="0";
+
           source ~/.config/zsh/powerlevel10k.zsh
+          source ~/.ghcup/env
         '';
         plugins = [
           {
@@ -148,9 +143,11 @@
         enableZshIntegration = true;
       };
       home = {
-        packages = with pkgs; [ zsh-powerlevel10k ];
+        packages = [
+          pkgs.zsh-powerlevel10k
+          klon
+        ];
         file.".config/zsh/powerlevel10k.zsh".source = ./powerlevel10k.zsh;
       };
     };
-  };
 }

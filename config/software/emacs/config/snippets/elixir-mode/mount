@@ -1,8 +1,0 @@
-# -*- mode: snippet -*-
-# name: mount
-# key: mount
-# --
-@impl true
-def mount(_params, _session, socket) do
-  {:ok, socket}$0
-end
