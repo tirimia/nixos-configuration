@@ -31,7 +31,8 @@
       };
       nix.nixPath = [ "nixpkgs=flake:nixpkgs" ];
       environment.etc."nix/nix.custom.conf".text = ''
-        nix-path = nixpkgs=flake:nixpkgs
+        nix-path = "nixpkgs=flake:nixpkgs"
+        trusted-users = tirimia
       '';
       fonts.packages = with pkgs; [
         iosevka-comfy.comfy-wide

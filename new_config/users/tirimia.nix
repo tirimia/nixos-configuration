@@ -1,6 +1,9 @@
 { inputs, ... }:
 {
   flake.modules.darwin.tirimiaUser =
+    let
+      name = "tirimia";
+    in
     {
       config,
       lib,
@@ -9,11 +12,11 @@
     }:
     {
       users.users.tirimia = {
-        name = "tirimia";
-        home = "/Users/tirimia";
+        inherit name;
+        home = "/Users/${name}";
       };
 
-      home-manager.users.tirimia = {
+      home-manager.users."${name}" = {
         imports = [
           inputs.self.modules.homeManager.emacs
           inputs.self.modules.homeManager.neovim
@@ -24,7 +27,7 @@
             programs.git.settings = {
               user.name = "Theodor-Alexandru Irimia";
               user.email = "11174371+tirimia@users.noreply.github.com";
-              github.user = "tirimia";
+              github.user = name;
             };
           }
           inputs.self.modules.homeManager.zsh
